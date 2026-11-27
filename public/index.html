@@ -139,6 +139,42 @@ aside h2 .s{font-family:var(--script);font-size:24px;text-transform:none;letter-
 .chips button[aria-pressed="true"]{background:#c99a52;color:#3b1d14;box-shadow:0 0 0 3px #f3d9a4}
 .felt .btn.ghost{color:#fffaf3;border-color:rgba(255,250,243,.4)}
 .felt .rules{font-size:12px;color:#d9c3a6;line-height:1.5;margin:12px 0 0}
+.felt.wide{width:min(760px,100%)}
+.gtabs{display:flex;gap:6px;justify-content:center;margin-bottom:8px;flex-wrap:wrap}
+.gtabs button{background:rgba(255,250,243,.08);border:1px solid rgba(255,250,243,.3);color:#fffaf3;border-radius:999px;padding:7px 14px;font-weight:700;font-size:13px}
+.gtabs button[aria-selected="true"]{background:#c99a52;color:#3b1d14;border-color:#c99a52}
+.tables{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.tbl{background:rgba(0,0,0,.18);border:1px solid rgba(255,250,243,.25);border-radius:14px;padding:12px;text-align:left;display:flex;flex-direction:column;gap:6px;min-width:0}
+.tbl b{font-size:16px;color:#f3d9a4}
+.tbl .st{font-size:12px;color:#ecd9bf}
+.tbl .nm{font-size:12px;color:#fffaf3;min-height:16px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tlHead{display:flex;justify-content:space-between;gap:8px;align-items:baseline;margin-bottom:8px;flex-wrap:wrap}
+.tlHead b{font-size:18px;color:#f3d9a4}
+#tlStatus{font-weight:700;color:#fffaf3}
+.opps{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:10px}
+.opp{background:rgba(0,0,0,.22);border:2px solid transparent;border-radius:12px;padding:6px 10px;min-width:110px;font-size:13px}
+.opp.turn{border-color:#f3c34b;box-shadow:0 0 14px rgba(243,195,75,.5)}
+.opp .n{font-weight:800;color:#fffaf3;display:block;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin:0 auto}
+.opp .c{color:#f3d9a4;font-weight:700}
+.opp .tag{display:inline-block;font-size:11px;background:rgba(255,250,243,.18);border-radius:6px;padding:1px 6px;margin-top:3px}
+.pile{background:rgba(0,0,0,.18);border-radius:14px;padding:8px;margin-bottom:8px}
+.pile .lbl{font-size:12px;color:#ecd9bf;font-weight:700;margin-bottom:6px}
+.pile .cards{min-height:84px}
+.timer{height:5px;background:rgba(255,250,243,.15);border-radius:3px;overflow:hidden;margin-bottom:8px}
+.timer i{display:block;height:100%;width:0;background:#f3c34b;transition:width .25s linear}
+#tlMsg{min-height:20px;font-weight:700;color:#f3d9a4;margin-bottom:8px}
+.hand13{display:flex;justify-content:center;padding:18px 6px 6px;margin-bottom:10px;overflow-x:auto}
+.hand13 .pc{cursor:pointer;margin-left:-20px;flex:none;transition:transform .12s;border:2px solid transparent}
+.hand13 .pc:first-child{margin-left:0}
+.hand13 .pc.sel{transform:translateY(-16px);border-color:#f3c34b;box-shadow:0 8px 16px rgba(0,0,0,.4)}
+.hand13 .pc:focus-visible{outline:2px solid #f3c34b}
+.tlLog{list-style:none;margin:10px 0 0;padding:0;font-size:12px;color:#ecd9bf;text-align:left;max-height:96px;overflow:auto}
+.tlLog li{padding:2px 0;border-bottom:1px dashed rgba(255,250,243,.12)}
+@media (max-width:760px){ .hand13 .pc{width:44px;height:64px;font-size:13px;padding:4px 5px} .hand13 .pc .s{font-size:20px} .hand13 .pc{margin-left:-22px} .felt.wide{padding:16px 12px} }
+@media (max-width:420px){ .hand13 .pc{margin-left:-26px} }
+#rbBanner{position:absolute;top:92px;left:50%;transform:translateX(-50%);background:rgba(122,29,18,.92);color:#fffaf3;padding:10px 18px;border-radius:14px;font-weight:700;text-align:center;max-width:min(92%,460px);pointer-events:none;box-shadow:0 8px 24px rgba(59,29,20,.3);border:1px solid #c99a52}
+#rbBanner .big{display:block;font-size:44px;line-height:1.1;color:#f3d9a4}
+#rbBanner .sm{display:block;font-size:12px;font-weight:600;color:#ecd9bf;margin-top:2px}
 @media (prefers-reduced-motion:reduce){.pc{animation:none}}
 @media (max-width:760px){
   aside{position:absolute;left:0;right:0;bottom:0;width:auto;height:58%;border-left:0;border-top:1px solid var(--line);border-radius:16px 16px 0 0;z-index:10;transform:translateY(100%);transition:transform .25s}
@@ -180,6 +216,7 @@ aside h2 .s{font-family:var(--script);font-size:24px;text-transform:none;letter-
     </div>
     <div class="hint">Kéo để xoay 360° · V: góc nhìn thứ nhất · Cuộn để phóng to · WASD / mũi tên hoặc chạm sàn để đi · E: ghé gian hàng · Đứng gần ai đó: 6 đánh · 7 hôn · 8 ôm · 9 bắt tay · Enter: chat</div>
     <div id="toast" style="opacity:0"></div>
+    <div id="rbBanner" hidden aria-live="polite"></div>
     <div class="interact" id="interact" hidden>
       <span class="who">Với <b id="nearName"></b></span>
       <div id="actBtns" style="display:contents"></div>
@@ -230,21 +267,53 @@ aside h2 .s{font-family:var(--script);font-size:24px;text-transform:none;letter-
 </div>
 
 <div class="modal" id="cardModal" hidden>
-  <div class="card felt">
-    <h1>🃏 Xì dách</h1>
-    <p class="sub">Đánh với nhà cái · Xu của bạn: <b id="xuTxt">1000</b></p>
-    <div class="hand"><div class="lbl">Nhà cái <b id="dScore"></b></div><div class="cards" id="dCards"></div></div>
-    <div class="hand"><div class="lbl">Bạn <b id="pScore"></b></div><div class="cards" id="pCards"></div></div>
-    <div id="bjMsg" aria-live="polite">Chọn mức cược rồi bấm Chia bài.</div>
-    <div class="chips" id="betRow"><span>Cược</span></div>
-    <div class="row" id="bjActions">
-      <button class="btn" id="dealBtn">Chia bài</button>
-      <button class="btn" id="hitBtn" hidden>Rút bài</button>
-      <button class="btn" id="standBtn" hidden>Dằn</button>
-      <button class="btn" id="refillBtn" hidden>Nhận thêm 500 xu</button>
-      <button class="btn ghost" id="cardClose">Rời bàn</button>
+  <div class="card felt wide">
+    <div class="gtabs" role="tablist">
+      <button type="button" id="tabTL" role="tab" aria-selected="true">🂡 Tiến lên · chơi với nhau</button>
+      <button type="button" id="tabBJ" role="tab" aria-selected="false">Xì dách · với nhà cái</button>
     </div>
-    <p class="rules">Rút sao cho gần 21 điểm nhất, quá 21 là quắc. Phải đủ 16 điểm mới được dằn. Xì bàn (2 lá A), Xì dách (A + 10/J/Q/K) và Ngũ linh (5 lá ≤ 21) thắng gấp đôi. Xu chỉ để chơi vui, không đổi thành tiền.</p>
+    <p class="sub">Xu của bạn: <b id="xuTxt">1000</b></p>
+
+    <section id="tlPane">
+      <div id="tlLobby">
+        <h1>Tiến lên miền Nam</h1>
+        <p class="sub">Chọn một bàn. Đủ 2–4 người là bấm Bắt đầu ván. Về nhất được thưởng 300 xu.</p>
+        <div class="tables" id="tlTables"></div>
+      </div>
+      <div id="tlTable" hidden>
+        <div class="tlHead"><b id="tlTitle"></b><span id="tlStatus"></span></div>
+        <div class="opps" id="tlOpps"></div>
+        <div class="pile"><div class="lbl" id="tlPileLbl">Chưa có bài trên bàn</div><div class="cards" id="tlPile"></div></div>
+        <div class="timer" aria-hidden="true"><i id="tlTimer"></i></div>
+        <div id="tlMsg" aria-live="polite"></div>
+        <div class="hand13" id="tlHand" aria-label="Bài của bạn"></div>
+        <div class="row">
+          <button class="btn" id="tlPlay">Đánh</button>
+          <button class="btn" id="tlPass">Bỏ lượt</button>
+          <button class="btn" id="tlStart">Bắt đầu ván</button>
+          <button class="btn ghost" id="tlLeave">Rời bàn</button>
+        </div>
+        <ol class="tlLog" id="tlLog"></ol>
+      </div>
+      <p class="rules">Lẻ, đôi, sám cô, tứ quý, sảnh (≥ 3 lá liền, không có 2), đôi thông. Bài to hơn cùng loại mới chặn được; 3 đôi thông chặt 1 heo, tứ quý chặt heo hoặc đôi heo, 4 đôi thông chặt tất. Bỏ lượt thì phải chờ vòng sau. Mỗi lượt 30 giây.</p>
+    </section>
+
+    <section id="bjPane" hidden>
+      <h1>🃏 Xì dách</h1>
+      <div class="hand"><div class="lbl">Nhà cái <b id="dScore"></b></div><div class="cards" id="dCards"></div></div>
+      <div class="hand"><div class="lbl">Bạn <b id="pScore"></b></div><div class="cards" id="pCards"></div></div>
+      <div id="bjMsg" aria-live="polite">Chọn mức cược rồi bấm Chia bài.</div>
+      <div class="chips" id="betRow"><span>Cược</span></div>
+      <div class="row" id="bjActions">
+        <button class="btn" id="dealBtn">Chia bài</button>
+        <button class="btn" id="hitBtn" hidden>Rút bài</button>
+        <button class="btn" id="standBtn" hidden>Dằn</button>
+        <button class="btn" id="refillBtn" hidden>Nhận thêm 500 xu</button>
+      </div>
+      <p class="rules">Rút sao cho gần 21 điểm nhất, quá 21 là quắc. Phải đủ 16 điểm mới được dằn. Xì bàn (2 lá A), Xì dách (A + 10/J/Q/K) và Ngũ linh (5 lá ≤ 21) thắng gấp đôi.</p>
+    </section>
+    <div class="row" style="margin-top:12px"><button class="btn ghost" id="cardClose">Rời quầy</button></div>
+    <p class="rules">Xu chỉ để chơi vui trong sự kiện, không đổi thành tiền.</p>
   </div>
 </div>
 
@@ -295,10 +364,10 @@ const booths = [
 ];
 const TOWER = {x:900,y:640,r:46}; // tháp ly sâm panh giữa sảnh
 booths.forEach(b => solids.push({x:b.x,y:b.y,w:b.w,h:b.h}));
-const zones = [{id:"stage",x:600,y:250,w:600,h:120}, ...booths.map(b => ({id:b.id, ...b.zone}))];
+const zones = [{id:"stage",x:600,y:250,w:600,h:120}, {id:"ribbon",x:750,y:375,w:300,h:80}, ...booths.map(b => ({id:b.id, ...b.zone}))];
 const tables = [[620,580],[1180,580],[720,780],[1080,780]].map(([x,y]) => ({x,y,r:34}));
 const plants = [[80,80],[W-80,80],[80,H-80],[W-80,H-80],[560,100],[1240,100]];
-const ZNAME = {stage:"Sân khấu",food:"Tiệc giao lưu",drink:"Quầy đồ uống",photo:"Photo booth",gift:"Quà tặng",checkin:"Đón khách",wheel:"Vòng quay",cards:"Quầy trò chơi"};
+const ZNAME = {stage:"Sân khấu",food:"Tiệc giao lưu",drink:"Quầy đồ uống",photo:"Photo booth",gift:"Quà tặng",checkin:"Đón khách",wheel:"Vòng quay",cards:"Quầy trò chơi",ribbon:"Cắt băng"};
 const zoneName = id => ZNAME[id] || "";
 
 const store = {
@@ -441,8 +510,22 @@ const Music = (() => {
     if(sec==="drop" && bar===14 && s===0) noise(t,1.6,"highpass",4000,0.35);
   }
   function schedule(){ while(nextT < ac.currentTime+0.15){ play(step,nextT); nextT+=S; step++; } }
+  function fxOut(vol){ if(!ac) init(); ac.resume(); const g=ac.createGain(); g.gain.value=vol; g.connect(ac.destination); return g; }
+  function hit(t,dur,freq,vol,out,type="bandpass"){ const s=ac.createBufferSource(); s.buffer=noiseBuf; const f=ac.createBiquadFilter(); f.type=type; f.frequency.value=freq; const g=ac.createGain(); g.gain.setValueAtTime(vol,t); g.gain.exponentialRampToValueAtTime(0.001,t+dur); s.connect(f); f.connect(g); g.connect(out); s.start(t, Math.random()*0.4); s.stop(t+dur+0.02); }
   return {
     get on(){ return on; },
+    drumroll(){ // trống dồn 3 giây trước khi cắt
+      try{ const out=fxOut(0.5), t0=ac.currentTime+0.02;
+        for(let i=0;i<48;i++){ const t=t0+i*0.0625; hit(t,0.06,1800,0.15+i/48*0.5,out); }
+      }catch(e){}
+    },
+    fanfare(){ // kèn chào mừng + chũm chọe khi băng đứt
+      try{ const out=fxOut(0.55), t=ac.currentTime+0.02;
+        [[60,0],[64,0.14],[67,0.28],[72,0.42]].forEach(([m,d]) => synth(t+d,m,0.35,0.12,3500,"sawtooth",[-8,8],out));
+        [60,64,67,72,76].forEach(m => synth(t+0.6,m,1.8,0.08,4200,"sawtooth",[-12,0,12],out));
+        hit(t+0.6,2.2,5000,0.6,out,"highpass"); hit(t+0.6,0.4,120,0.9,out,"lowpass");
+      }catch(e){}
+    },
     toggle(){
       if(!ac) init();
       if(on){ on=false; clearInterval(timer); master.gain.setTargetAtTime(0,ac.currentTime,0.08); }
@@ -476,6 +559,7 @@ function createSocketRoom(){
   sock.on("disconnect", () => { connected=false; connL.forEach(f=>f(false)); });
   return {
     get myId(){ return myId; },
+    sock,
     presence(obj){
       const patch = {}; let any = false;
       for(const k in obj){ if(obj[k]!==mine[k]){ patch[k]=obj[k]; any=true; } }
@@ -500,6 +584,12 @@ roomP.then(r => {
     ch.left.forEach(p => { const n = cleanName(p.presence.n); if(n && !p.sameTab) sysLog(n+" đã rời sự kiện"); remotes.delete(p.peer); seen.delete(p.peer); });
     renderPeople();
   });
+  if(r.sock){
+    r.sock.on("tl:lobby", l => { if(Array.isArray(l)){ tl.lobby = l; renderTL(); } });
+    r.sock.on("tl:table", v => onTLTable(v));
+    r.sock.on("tl:win", w => { if(w && typeof w.name==="string") sysLog("🏆 "+w.name.slice(0,18)+" về nhất Tiến lên ở "+String(w.table).slice(0,10)+"!"); });
+    r.sock.on("rb:state", s => onRibbon(s));
+  }
 }).catch(() => setOnline(false, "Chơi một mình"));
 
 function setOnline(ok, txt){ $("liveDot").classList.toggle("live", !!ok); updateOnlineTxt(txt); }
@@ -627,7 +717,58 @@ function doAction(){
   else if(z==="photo"){ stamp("photo"); openPhoto(); }
   else if(z==="wheel"){ if(me.stamps.size<6){ toast("Cần đủ 6 dấu mộc mới được quay ("+me.stamps.size+"/6)"); return; } openWheel(); }
   else if(z==="cards"){ openCards(); }
+  else if(z==="ribbon"){
+    const s = room && room.sock;
+    if(!s){ toast("Cắt băng chỉ làm được trên link chính của sự kiện."); return; }
+    if(rb.state==="cut"){ toast("Băng vừa được cắt! Lát nữa băng sẽ được buộc lại để cắt tiếp 🎊"); return; }
+    if(!rbHolding()){ s.emit("rb:hold", true); toast("Bạn đã cầm kéo ✂ Rủ mọi người cùng cầm rồi bấm Cắt băng!"); }
+    else if(rb.state==="tied") s.emit("rb:cut");
+  }
 }
+
+// ---- Cắt băng khai trương (đồng bộ cả sảnh qua máy chủ) ----
+let rb = {state:"tied", holders:[], ids:[], by:[], countdownAt:0, cutAt:0, offset:0, init:false};
+const rbHolding = () => !!(room && room.myId && rb.ids.includes(room.myId));
+function onRibbon(s){
+  if(!s || typeof s.state!=="string") return;
+  const prev = rb.state, first = !rb.init;
+  rb = {state:s.state, holders:(s.holders||[]).map(n=>String(n).slice(0,18)), ids:s.ids||[], by:(s.by||[]).map(n=>String(n).slice(0,18)), countdownAt:s.countdownAt||0, cutAt:s.cutAt||0, offset:(s.now||Date.now())-Date.now(), init:true};
+  if(s.state==="cut" && prev!=="cut"){
+    setRibbonCut(true, !first);
+    if(!first){
+      const who = rb.by.length ? rb.by.join(", ") : "Mọi người";
+      sysLog("🎊 "+who+" đã cắt băng khai trương!");
+      Music.fanfare();
+    }
+  }
+  if(s.state==="tied" && prev==="cut") setRibbonCut(false, false);
+  if(s.state==="countdown" && prev!=="countdown") Music.drumroll();
+  renderRibbonBanner(); updateActionBtn();
+}
+function renderRibbonBanner(){
+  const el = $("rbBanner"), now = Date.now()+rb.offset;
+  if(rb.state==="countdown"){
+    const n = Math.max(1, Math.ceil((rb.countdownAt-now)/1000));
+    el.hidden = false; el.replaceChildren();
+    const b=document.createElement("span"); b.className="big"; b.textContent = n+"…";
+    const sm=document.createElement("span"); sm.className="sm"; sm.textContent = "✂ "+rb.holders.join(", ")+" chuẩn bị cắt băng!";
+    el.append(b,sm); return;
+  }
+  if(rb.state==="cut" && now-rb.cutAt < 9000){
+    el.hidden = false; el.replaceChildren();
+    const b=document.createElement("span"); b.className="big"; b.textContent="🎊 KHAI TRƯƠNG HỒNG PHÁT!"; b.style.fontSize="22px";
+    const sm=document.createElement("span"); sm.className="sm"; sm.textContent=(rb.by.join(", ")||"Mọi người")+" đã cắt băng";
+    el.append(b,sm); return;
+  }
+  if(rb.state==="tied" && rb.holders.length){
+    el.hidden = false; el.replaceChildren();
+    const sm=document.createElement("span"); sm.textContent = "✂ Đang cầm kéo: "+rb.holders.join(", ");
+    const s2=document.createElement("span"); s2.className="sm"; s2.textContent = "Tới dải băng đỏ trước sân khấu để cùng cắt";
+    el.append(sm,s2); return;
+  }
+  el.hidden = true;
+}
+setInterval(renderRibbonBanner, 200);
 
 // ---- Quầy trò chơi: xì dách với nhà cái ----
 const SUITS = ["♠","♥","♦","♣"], RANKS = ["A","2","3","4","5","6","7","8","9","10","J","Q","K"];
@@ -667,7 +808,95 @@ function renderCards(){
   $("hitBtn").hidden = $("standBtn").hidden = !playing;
   $("refillBtn").hidden = !(xu < 10 && !playing);
 }
-function openCards(){ $("cardModal").hidden = false; if(bj.bet > xu) bj.bet = [200,100,50,10].find(v=>v<=xu) || 10; renderCards(); }
+function openCards(){ $("cardModal").hidden = false; if(bj.bet > xu) bj.bet = [200,100,50,10].find(v=>v<=xu) || 10; renderCards(); renderTL(); }
+function showTab(which){
+  const isTL = which==="tl";
+  $("tabTL").setAttribute("aria-selected", String(isTL)); $("tabBJ").setAttribute("aria-selected", String(!isTL));
+  $("tlPane").hidden = !isTL; $("bjPane").hidden = isTL;
+}
+$("tabTL").onclick = () => showTab("tl"); $("tabBJ").onclick = () => showTab("bj");
+
+// ---- Tiến lên nhiều người (máy chủ giữ bài) ----
+const TL_R = ["3","4","5","6","7","8","9","10","J","Q","K","A","2"], TL_S = ["♠","♣","♦","♥"];
+const tlCard = v => ({r:TL_R[v>>2], s:TL_S[v&3]});
+const tl = {lobby:[], table:null, sel:new Set(), offset:0, rewarded:""};
+const tlSock = () => room && room.sock;
+function tlMsg(t){ $("tlMsg").textContent = t; }
+function onTLTable(v){
+  if(!v || !Array.isArray(v.seats)) return;
+  const prev = tl.table;
+  tl.table = v; tl.offset = (v.now||Date.now()) - Date.now();
+  const hand = new Set(v.hand||[]); for(const c of [...tl.sel]) if(!hand.has(c)) tl.sel.delete(c);
+  if(v.state==="ended" && v.you>=0 && v.winnerSeat===v.you){
+    const key = v.id+"|"+(v.log||[]).join("|");
+    if(tl.rewarded!==key && prev && prev.state==="playing"){ tl.rewarded = key; xu += 300; store.set("xu",xu); me.cardMsg = "về nhất Tiến lên +300 xu 🏆"; me.cardT = Date.now(); pushPresence(true); renderPeople(); toast("🏆 Bạn về nhất! +300 xu"); }
+  }
+  if(prev && prev.state!=="playing" && v.state==="playing") tlMsg(v.turn===v.you ? "Tới lượt bạn! Lượt đầu phải đánh kèm lá "+(tlCard(v.firstCard).r+tlCard(v.firstCard).s)+"." : "Ván mới đã chia bài.");
+  renderTL();
+}
+function renderTL(){
+  if($("cardModal").hidden) return;
+  $("xuTxt").textContent = xu.toLocaleString("vi-VN");
+  const v = tl.table, seated = v && v.you>=0;
+  $("tlLobby").hidden = !!seated; $("tlTable").hidden = !seated;
+  if(!seated){
+    if(!tlSock()){ const p=document.createElement("p"); p.className="sub"; p.textContent="Tiến lên nhiều người chỉ chơi được trên link chính của sự kiện."; $("tlTables").replaceChildren(p); return; }
+    $("tlTables").replaceChildren(...tl.lobby.map(t => {
+      const d = document.createElement("div"); d.className="tbl";
+      const b = document.createElement("b"); b.textContent = t.title;
+      const st = document.createElement("span"); st.className="st"; st.textContent = t.players+"/4 người · "+(t.state==="playing"?"đang chơi":t.state==="ended"?"vừa xong ván":"đang chờ");
+      const nm = document.createElement("span"); nm.className="nm"; nm.textContent = (t.names||[]).join(", ") || "Bàn trống";
+      const btn = document.createElement("button"); btn.className="btn"; btn.type="button"; btn.textContent = t.players>=4 ? "Đã đủ người" : "Vào bàn"; btn.disabled = t.players>=4;
+      btn.onclick = () => tlSock().emit("tl:join", t.id, e => { if(e) toast(e); });
+      d.append(b,st,nm,btn); return d;
+    }));
+    return;
+  }
+  $("tlTitle").textContent = v.title;
+  const turnName = v.turn>=0 && v.seats[v.turn] ? v.seats[v.turn].name : "";
+  const myTurn = v.state==="playing" && v.turn===v.you;
+  $("tlStatus").textContent = v.state==="playing" ? (myTurn ? "👉 Tới lượt bạn!" : "Lượt của "+turnName) : v.state==="ended" ? "🏆 "+(v.ranking[0]?v.ranking[0].name:"")+" về nhất" : "Đang chờ người chơi ("+v.seats.filter(Boolean).length+"/4)";
+  const opps = [];
+  for(let k=1;k<4;k++){ const i=(v.you+k)%4, s=v.seats[i]; if(!s) continue;
+    const d=document.createElement("div"); d.className="opp"+(v.state==="playing"&&v.turn===i?" turn":"");
+    const n=document.createElement("span"); n.className="n"; n.textContent=s.name;
+    const c=document.createElement("span"); c.className="c"; c.textContent = s.playing ? "🂠 × "+s.count : "";
+    d.append(n,c);
+    const tag = !s.playing && v.state==="playing" ? "Chờ ván sau" : s.passed ? "Bỏ lượt" : "";
+    if(tag){ const g=document.createElement("span"); g.className="tag"; g.textContent=tag; d.append(document.createElement("br"), g); }
+    opps.push(d);
+  }
+  if(!opps.length){ const p=document.createElement("span"); p.className="sub"; p.textContent="Chưa có ai khác. Rủ bạn bè tới Quầy trò chơi, chọn "+v.title+"."; opps.push(p); }
+  $("tlOpps").replaceChildren(...opps);
+  $("tlPileLbl").textContent = v.cur ? v.cur.name+" vừa đánh" : (v.state==="playing" ? (myTurn ? "Bạn được đánh mới" : turnName+" được đánh mới") : "Chưa có bài trên bàn");
+  $("tlPile").replaceChildren(...(v.cur ? v.cur.cards.map(c => cardEl(tlCard(c),false)) : []));
+  $("tlHand").replaceChildren(...(v.hand||[]).map(c => {
+    const el = cardEl(tlCard(c), false); el.tabIndex = 0; el.setAttribute("role","button");
+    if(tl.sel.has(c)) el.classList.add("sel");
+    const toggle = () => { if(tl.sel.has(c)) tl.sel.delete(c); else tl.sel.add(c); renderTL(); };
+    el.onclick = toggle; el.onkeydown = e => { if(e.key==="Enter"||e.key===" "){ e.preventDefault(); toggle(); } };
+    return el;
+  }));
+  $("tlPlay").hidden = $("tlPass").hidden = v.state!=="playing";
+  $("tlPlay").disabled = !myTurn || !tl.sel.size;
+  $("tlPass").disabled = !myTurn || !v.cur;
+  $("tlStart").hidden = v.state==="playing";
+  $("tlStart").textContent = v.state==="ended" ? "Ván mới" : "Bắt đầu ván";
+  $("tlStart").disabled = v.seats.filter(Boolean).length < 2;
+  if(v.state==="ended" && v.ranking.length) tlMsg(v.ranking.map(r => r.place+". "+r.name+(r.place===1?" 🏆":" (còn "+r.left+" lá)")).join(" · "));
+  else if(v.state==="waiting") tlMsg(v.seats.filter(Boolean).length<2 ? "Cần ít nhất 2 người để bắt đầu." : "Đủ người rồi, bấm Bắt đầu ván!");
+  $("tlLog").replaceChildren(...(v.log||[]).slice().reverse().map(s => { const li=document.createElement("li"); li.textContent=s; return li; }));
+}
+setInterval(() => {
+  const v = tl.table;
+  if(!v || $("cardModal").hidden || v.state!=="playing"){ $("tlTimer").style.width = "0"; return; }
+  const left = Math.max(0, v.deadline - (Date.now()+tl.offset));
+  $("tlTimer").style.width = (left/30000*100)+"%";
+}, 250);
+$("tlPlay").onclick = () => { const s = tlSock(); if(!s || !tl.sel.size) return; s.emit("tl:play", [...tl.sel], e => { if(e) tlMsg(e); else { tl.sel.clear(); tlMsg(""); } }); };
+$("tlPass").onclick = () => { const s = tlSock(); if(s) s.emit("tl:pass", e => { if(e) tlMsg(e); else tlMsg(""); }); };
+$("tlStart").onclick = () => { const s = tlSock(); if(s) s.emit("tl:start", e => { if(e) tlMsg(e); }); };
+$("tlLeave").onclick = () => { const s = tlSock(); if(s) s.emit("tl:leave"); tl.table = null; tl.sel.clear(); renderTL(); };
 function bjDeal(){
   if(xu < bj.bet){ $("bjMsg").textContent = "Không đủ xu cho mức cược này."; return; }
   bj.deck = newDeck(); bj.p = [bj.deck.pop(), bj.deck.pop()]; bj.d = [bj.deck.pop(), bj.deck.pop()]; bj.state = "play";
@@ -709,13 +938,18 @@ function bjResolve(){
 }
 $("dealBtn").onclick = bjDeal; $("hitBtn").onclick = bjHit; $("standBtn").onclick = bjStand;
 $("refillBtn").onclick = () => { xu += 500; store.set("xu",xu); $("bjMsg").textContent = "Nhà cái tặng bạn 500 xu. Chúc may mắn!"; renderCards(); pushPresence(true); };
-$("cardClose").onclick = () => { if(bj.state==="play"){ $("bjMsg").textContent = "Đang giữa ván, hãy dằn hoặc rút cho xong nhé."; return; } $("cardModal").hidden = true; };
+$("cardClose").onclick = () => {
+  if(bj.state==="play"){ showTab("bj"); $("bjMsg").textContent = "Đang giữa ván, hãy dằn hoặc rút cho xong nhé."; return; }
+  if(tl.table && tl.table.you>=0 && tl.table.state==="playing"){ showTab("tl"); tlMsg("Bạn đang trong ván Tiến lên. Bấm Rời bàn nếu muốn bỏ ván."); return; }
+  $("cardModal").hidden = true;
+};
 const actionBtn = $("actionBtn");
 actionBtn.onclick = doAction;
 function updateActionBtn(){
   if(!me.joined || !me.zone){ actionBtn.hidden = true; return; }
   actionBtn.hidden = false;
-  const labels = {checkin:"Check-in",food:"Dùng tiệc",drink:"Lấy đồ uống",gift:"Nhận quà",stage:me.dance?"Dừng nhảy":"Quẩy trước sân khấu",photo:"Chụp ảnh",wheel:"Quay thưởng",cards:"Ngồi vào bàn bài"};
+  const labels = {checkin:"Check-in",food:"Dùng tiệc",drink:"Lấy đồ uống",gift:"Nhận quà",stage:me.dance?"Dừng nhảy":"Quẩy trước sân khấu",photo:"Chụp ảnh",wheel:"Quay thưởng",cards:"Ngồi vào bàn bài",
+    ribbon: rb.state==="cut" ? "Băng đã cắt 🎊" : rb.state==="countdown" ? (rbHolding() ? "✂ Sắp cắt…" : "Cầm kéo cùng ✂") : rbHolding() ? "✂ Cắt băng!" : "Cầm kéo ✂"};
   const t = labels[me.zone] + " (E)"; if(actionBtn.textContent!==t) actionBtn.textContent = t;
 }
 
@@ -932,6 +1166,40 @@ function drawFloorTex(c){
   c.fillStyle="#c99a52"; c.fillRect(844,370,6,H-370); c.fillRect(950,370,6,H-370);
 }
 let built = false, posterTex = null;
+let rbParts = null, rbWantCut = false;
+const confetti = [];
+function setRibbonCut(cut, fx){
+  rbWantCut = cut;
+  if(rbParts){ rbParts.whole.forEach(m => m.visible = !cut); rbParts.halves.forEach(m => m.visible = cut); }
+  if(cut && fx && rbParts) celebrate(rbParts.x, rbParts.z);
+}
+function celebrate(x, z){
+  // pháo giấy 4 màu rơi quanh dải băng + bắn pháo hoa liên tục
+  ["#b3201b","#f3c34b","#fffaf3","#e9a3a3"].forEach((c,k) => {
+    const n = 140, pos = new Float32Array(n*3), vel = new Float32Array(n*3);
+    for(let i=0;i<n;i++){ pos[i*3]=x+(Math.random()-0.5)*1.2; pos[i*3+1]=1.0; pos[i*3+2]=z+(Math.random()-0.5)*0.6;
+      const a=Math.random()*Math.PI*2, sp=1.5+Math.random()*3; vel[i*3]=Math.cos(a)*sp; vel[i*3+1]=3+Math.random()*4; vel[i*3+2]=Math.sin(a)*sp; }
+    const geo = new T.BufferGeometry(); geo.setAttribute("position", new T.BufferAttribute(pos,3));
+    const pts = new T.Points(geo, new T.PointsMaterial({color:c,size:0.12,transparent:true,depthWrite:false,toneMapped:false}));
+    scene.add(pts); confetti.push({pts,vel,n,t0:performance.now(),seed:k});
+  });
+  const now = performance.now(); fireworks.forEach((f,i) => f.next = now + i*250);
+  setTimeout(() => { const n2 = performance.now(); fireworks.forEach((f,i) => f.next = n2 + i*300); }, 1400);
+}
+function updateConfetti(dt){
+  const now = performance.now();
+  for(let k=confetti.length-1;k>=0;k--){
+    const c = confetti[k], age = (now-c.t0)/1000;
+    if(age > 7){ scene.remove(c.pts); c.pts.geometry.dispose(); c.pts.material.dispose(); confetti.splice(k,1); continue; }
+    const p = c.pts.geometry.attributes.position.array;
+    for(let i=0;i<c.n;i++){
+      c.vel[i*3+1] = Math.max(-1.2, c.vel[i*3+1] - 6*dt); c.vel[i*3] *= 0.985; c.vel[i*3+2] *= 0.985;
+      p[i*3] += (c.vel[i*3] + Math.sin(age*4+i)*0.4)*dt; p[i*3+1] = Math.max(0.03, p[i*3+1] + c.vel[i*3+1]*dt); p[i*3+2] += c.vel[i*3+2]*dt;
+    }
+    c.pts.geometry.attributes.position.needsUpdate = true;
+    c.pts.material.opacity = age > 5.5 ? 1-(age-5.5)/1.5 : 1;
+  }
+}
 const zoneMeshes = {}, doneSprites = {}, bulbs = [], beams = [], fireworks = [];
 function scriptPanel(w,h,lines){
   return canvasTex(w,h,g=>{ g.fillStyle="#f6eee4"; g.fillRect(0,0,w,h);
@@ -995,11 +1263,20 @@ function buildScene(){
   // ribbon-cutting setup in front of the stage
   const rcZ = Z(400), rx1 = X(770), rx2 = X(1030);
   [rx1,rx2].forEach(x => { box(0.08,1.1,0.08,goldM(),x,0.55,rcZ); const base=new T.Mesh(new T.CylinderGeometry(0.22,0.26,0.06,20),goldM()); base.position.set(x,0.03,rcZ); scene.add(base); const top=new T.Mesh(new T.SphereGeometry(0.07,12,10),goldM()); top.position.set(x,1.12,rcZ); scene.add(top); });
-  ribbon([[rx1,1.05,rcZ],[(rx1+rx2)/2-1.5,0.95,rcZ],[(rx1+rx2)/2,0.92,rcZ],[(rx1+rx2)/2+1.5,0.95,rcZ],[rx2,1.05,rcZ]],0.06);
-  const bowC = (rx1+rx2)/2;
-  [-1,1].forEach(s => { const l=new T.Mesh(new T.TorusGeometry(0.18,0.06,10,24),silkM()); l.scale.set(1.4,0.8,0.6); l.position.set(bowC+s*0.24,0.98,rcZ); scene.add(l); ribbon([[bowC,0.92,rcZ],[bowC+s*0.12,0.7,rcZ],[bowC+s*0.2,0.5,rcZ]],0.04); });
-  const knot = new T.Mesh(new T.SphereGeometry(0.1,14,12),silkM()); knot.position.set(bowC,0.95,rcZ); scene.add(knot);
-  const rcSign = textSprite(["✂ Nghi thức cắt băng · 10:00"],{font:"700 24px "+SANS,fg:"#7a1d12",bg:"rgba(255,250,243,0.92)",ppu:130}); rcSign.position.set(bowC,1.35,rcZ); scene.add(rcSign);
+  const bowC = (rx1+rx2)/2, whole = [];
+  whole.push(ribbon([[rx1,1.05,rcZ],[bowC-1.5,0.95,rcZ],[bowC,0.92,rcZ],[bowC+1.5,0.95,rcZ],[rx2,1.05,rcZ]],0.06));
+  [-1,1].forEach(s => { const l=new T.Mesh(new T.TorusGeometry(0.18,0.06,10,24),silkM()); l.scale.set(1.4,0.8,0.6); l.position.set(bowC+s*0.24,0.98,rcZ); scene.add(l); whole.push(l); whole.push(ribbon([[bowC,0.92,rcZ],[bowC+s*0.12,0.7,rcZ],[bowC+s*0.2,0.5,rcZ]],0.04)); });
+  const knot = new T.Mesh(new T.SphereGeometry(0.1,14,12),silkM()); knot.position.set(bowC,0.95,rcZ); scene.add(knot); whole.push(knot);
+  // hai nửa băng rủ xuống sau khi cắt
+  const halves = [
+    ribbon([[rx1,1.05,rcZ],[rx1+0.9,0.85,rcZ+0.05],[rx1+1.6,0.45,rcZ+0.1],[rx1+1.9,0.06,rcZ+0.2]],0.06),
+    ribbon([[rx2,1.05,rcZ],[rx2-0.9,0.85,rcZ+0.05],[rx2-1.6,0.45,rcZ+0.1],[rx2-1.9,0.06,rcZ+0.2]],0.06),
+  ];
+  const fallenBow = new T.Mesh(new T.TorusGeometry(0.18,0.06,10,24),silkM()); fallenBow.scale.set(1.4,0.8,0.6); fallenBow.rotation.x=-Math.PI/2; fallenBow.position.set(bowC+0.3,0.06,rcZ+0.4); scene.add(fallenBow); halves.push(fallenBow);
+  halves.forEach(m => m.visible = false);
+  rbParts = {whole, halves, x:bowC, z:rcZ};
+  setRibbonCut(rbWantCut, false);
+  const rcSign = textSprite(["✂ Cắt băng khai trương · cùng cầm kéo!"],{font:"700 24px "+SANS,fg:"#7a1d12",bg:"rgba(255,250,243,0.92)",ppu:130}); rcSign.position.set(bowC,1.35,rcZ); scene.add(rcSign);
 
   // booths
   booths.forEach(b => {
@@ -1367,7 +1644,10 @@ function update(dt){
     if(target && Math.abs(me.x-ox)+Math.abs(me.y-oy)<0.05) target=null;
   } else if(cam.fp && me.joined){ me.dir = Math.atan2(-Math.cos(cam.yaw), -Math.sin(cam.yaw)); } // đứng yên vẫn quay mặt theo hướng nhìn
   const z = zones.find(z => inRect(me.x,me.y,z)); const zid = me.joined && z ? z.id : null;
-  if(zid !== me.zone){ me.zone = zid; if(zid!=="stage") me.dance=false; renderPeople(); pushPresence(true); }
+  if(zid !== me.zone){
+    if(me.zone==="ribbon" && rbHolding() && rb.state==="tied" && room && room.sock) room.sock.emit("rb:hold", false);
+    me.zone = zid; if(zid!=="stage") me.dance=false; renderPeople(); pushPresence(true);
+  }
   updateActionBtn();
   pushPresence(false);
   updateNpcs(dt);
@@ -1392,6 +1672,7 @@ function sync3D(dt,t){
   for(const [k,a] of anims) if(performance.now()-a.t0 > 1400) anims.delete(k);
   updateFx(dt);
   updateFireworks(performance.now(), dt);
+  updateConfetti(dt);
   nearRing.visible = !!near;
   if(near){ nearRing.position.set(X(near.x),0.05,Z(near.y)); nearRing.rotation.z = t/600; }
   npcs.forEach((n,i) => { let av=npcAv.get(i); if(!av){ av=makeAvatar({n:n.n+" 🎵",c:n.c,a:n.a,g:n.g,dir:n.dir,role:n.role},false); npcAv.set(i,av); } syncAvatar(av,n,n.x,n.y,t,dt,anims.get("npc:"+i)); if(n.onStage) av.root.position.y=0.72; });

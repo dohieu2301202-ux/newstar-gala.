@@ -58,6 +58,42 @@ io.on("connection", (socket) => {
   });
 });
 
+function nameOf(id) {
+  const p = players.get(id);
+  return p && typeof p.n === "string" && p.n ? p.n.slice(0, 18) : "Khách";
+}
+
+// ===== Cắt băng khai trương (trạng thái chung cho cả sảnh) =====
+const RIBBON_RESET_MS = 45000;
+const ribbon = { state: "tied", holders: new Map(), by: [], countdownAt: 0, cutAt: 0 };
+const ribbonView = () => ({
+  state: ribbon.state, holders: [...ribbon.holders.values()], ids: [...ribbon.holders.keys()],
+  by: ribbon.by, countdownAt: ribbon.countdownAt, cutAt: ribbon.cutAt, now: Date.now(),
+});
+const sendRibbon = () => io.emit("rb:state", ribbonView());
+
+io.on("connection", (socket) => {
+  socket.emit("rb:state", ribbonView());
+  socket.on("rb:hold", (on) => {
+    if (ribbon.state === "cut") return;
+    if (on) ribbon.holders.set(socket.id, nameOf(socket.id)); else ribbon.holders.delete(socket.id);
+    sendRibbon();
+  });
+  socket.on("rb:cut", () => {
+    if (ribbon.state !== "tied" || !ribbon.holders.has(socket.id)) return;
+    ribbon.state = "countdown"; ribbon.countdownAt = Date.now() + 3000; sendRibbon();
+    setTimeout(() => {
+      ribbon.state = "cut"; ribbon.by = [...ribbon.holders.values()]; ribbon.cutAt = Date.now(); ribbon.holders.clear();
+      sendRibbon();
+      setTimeout(() => { ribbon.state = "tied"; ribbon.by = []; sendRibbon(); }, RIBBON_RESET_MS);
+    }, 3000);
+  });
+  socket.on("disconnect", () => { if (ribbon.holders.delete(socket.id)) sendRibbon(); });
+});
+
+// ===== Tiến lên nhiều người =====
+require("./tienlen")(io, nameOf);
+
 setInterval(() => {
   if (!dirty.size) return;
   const batch = [...dirty].map(([peer, patch]) => ({ peer, patch }));
