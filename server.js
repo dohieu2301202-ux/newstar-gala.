@@ -16,7 +16,7 @@ const server = http.createServer(app);
 const io = new Server(server, { maxHttpBufferSize: 16 * 1024, cors: { origin: false } });
 
 // Chỉ nhận các trường game dùng tới, giá trị đơn giản và ngắn
-const ALLOWED = new Set(["n","c","a","g","x","y","d","m","z","da","st","say","sayT","emo","emoT","win","winT","act","actT","actTo"]);
+const ALLOWED = new Set(["n","c","a","g","x","y","d","m","z","da","st","say","sayT","emo","emoT","win","winT","act","actT","actTo","xu","cardT","cardMsg"]);
 function sanitize(patch) {
   const out = {};
   if (!patch || typeof patch !== "object") return out;

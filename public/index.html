@@ -117,6 +117,29 @@ aside h2 .s{font-family:var(--script);font-size:24px;text-transform:none;letter-
 #wheelCanvas,#photoCanvas{display:block;margin:0 auto 14px;max-width:100%}
 .row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
 
+.camBtns button[aria-pressed="true"]{background:var(--red);color:#fff;border-color:var(--red)}
+.felt{background:radial-gradient(circle at 50% 25%,#8a2418,#4a120c);color:#fffaf3;border:2px solid var(--gold);width:min(480px,100%);text-align:center}
+.felt h1{color:#f3d9a4}
+.felt .sub{color:#ecd9bf;margin:0 0 12px}
+.felt .sub b{color:#f3c34b}
+.hand{margin-bottom:12px}
+.hand .lbl{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#ecd9bf;font-weight:700;margin-bottom:6px}
+.hand .lbl b{color:#fff;font-size:14px}
+.cards{display:flex;gap:8px;min-height:84px;flex-wrap:wrap;justify-content:center}
+.pc{width:56px;height:80px;border-radius:8px;background:#fffaf3;color:#1f1715;display:flex;flex-direction:column;justify-content:space-between;padding:5px 6px;font-weight:800;font-size:15px;box-shadow:0 3px 10px rgba(0,0,0,.35);animation:deal .25s ease-out;text-align:left}
+.pc.red{color:#b3201b}
+.pc .s{font-size:26px;align-self:center;line-height:1}
+.pc .b{align-self:flex-end;transform:rotate(180deg)}
+.pc.back{background:repeating-linear-gradient(45deg,#7a1d12 0 6px,#c27b55 6px 12px);border:3px solid #fffaf3}
+@keyframes deal{from{transform:translateY(-16px) rotate(-8deg);opacity:0}}
+#bjMsg{min-height:22px;font-weight:700;color:#f3d9a4;margin:4px 0 12px}
+.chips{display:flex;gap:6px;justify-content:center;align-items:center;margin-bottom:10px;flex-wrap:wrap}
+.chips span{font-size:12px;color:#ecd9bf;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.chips button{width:46px;height:46px;border-radius:50%;border:3px dashed #fffaf3;background:#b3201b;color:#fff;font-weight:800;font-size:13px}
+.chips button[aria-pressed="true"]{background:#c99a52;color:#3b1d14;box-shadow:0 0 0 3px #f3d9a4}
+.felt .btn.ghost{color:#fffaf3;border-color:rgba(255,250,243,.4)}
+.felt .rules{font-size:12px;color:#d9c3a6;line-height:1.5;margin:12px 0 0}
+@media (prefers-reduced-motion:reduce){.pc{animation:none}}
 @media (max-width:760px){
   aside{position:absolute;left:0;right:0;bottom:0;width:auto;height:58%;border-left:0;border-top:1px solid var(--line);border-radius:16px 16px 0 0;z-index:10;transform:translateY(100%);transition:transform .25s}
   aside.open{transform:none}
@@ -153,8 +176,9 @@ aside h2 .s{font-family:var(--script);font-size:24px;text-transform:none;letter-
       <button type="button" id="zoomIn" aria-label="Phóng to">+</button>
       <button type="button" id="zoomOut" aria-label="Thu nhỏ">−</button>
       <button type="button" id="spinBtn360" aria-label="Xoay 360 độ quanh nhân vật" title="Tự xoay 360°">⟳</button>
+      <button type="button" id="fpBtn" aria-pressed="false" aria-label="Góc nhìn thứ nhất" title="Góc nhìn thứ nhất (phím V)">👁</button>
     </div>
-    <div class="hint">Kéo để xoay 360° · Cuộn để phóng to · WASD / mũi tên hoặc chạm sàn để đi · E: ghé gian hàng · Đứng gần ai đó: 6 đánh · 7 hôn · 8 ôm · 9 bắt tay · Enter: chat</div>
+    <div class="hint">Kéo để xoay 360° · V: góc nhìn thứ nhất · Cuộn để phóng to · WASD / mũi tên hoặc chạm sàn để đi · E: ghé gian hàng · Đứng gần ai đó: 6 đánh · 7 hôn · 8 ôm · 9 bắt tay · Enter: chat</div>
     <div id="toast" style="opacity:0"></div>
     <div class="interact" id="interact" hidden>
       <span class="who">Với <b id="nearName"></b></span>
@@ -205,6 +229,25 @@ aside h2 .s{font-family:var(--script);font-size:24px;text-transform:none;letter-
   </div>
 </div>
 
+<div class="modal" id="cardModal" hidden>
+  <div class="card felt">
+    <h1>🃏 Xì dách</h1>
+    <p class="sub">Đánh với nhà cái · Xu của bạn: <b id="xuTxt">1000</b></p>
+    <div class="hand"><div class="lbl">Nhà cái <b id="dScore"></b></div><div class="cards" id="dCards"></div></div>
+    <div class="hand"><div class="lbl">Bạn <b id="pScore"></b></div><div class="cards" id="pCards"></div></div>
+    <div id="bjMsg" aria-live="polite">Chọn mức cược rồi bấm Chia bài.</div>
+    <div class="chips" id="betRow"><span>Cược</span></div>
+    <div class="row" id="bjActions">
+      <button class="btn" id="dealBtn">Chia bài</button>
+      <button class="btn" id="hitBtn" hidden>Rút bài</button>
+      <button class="btn" id="standBtn" hidden>Dằn</button>
+      <button class="btn" id="refillBtn" hidden>Nhận thêm 500 xu</button>
+      <button class="btn ghost" id="cardClose">Rời bàn</button>
+    </div>
+    <p class="rules">Rút sao cho gần 21 điểm nhất, quá 21 là quắc. Phải đủ 16 điểm mới được dằn. Xì bàn (2 lá A), Xì dách (A + 10/J/Q/K) và Ngũ linh (5 lá ≤ 21) thắng gấp đôi. Xu chỉ để chơi vui, không đổi thành tiền.</p>
+  </div>
+</div>
+
 <div class="modal" id="photoModal" hidden>
   <div class="card center">
     <h1>Photo booth</h1>
@@ -248,12 +291,14 @@ const booths = [
   {id:"gift",  x:1530,y:640,w:210,h:150,color:"#c99a52",title:"Quà tặng",icon:"🎁",zone:{x:1420,y:640,w:110,h:150}},
   {id:"checkin",x:520,y:990,w:260,h:80,color:"#a35a36",title:"Đón khách",icon:"🎫",zone:{x:520,y:900,w:260,h:90}},
   {id:"wheel", x:1020,y:990,w:260,h:80,color:"#b3201b",title:"Vòng quay may mắn",icon:"🎡",zone:{x:1020,y:900,w:260,h:90}},
+  {id:"cards", x:60,  y:920,w:210,h:150,color:"#5c160f",title:"Quầy trò chơi",icon:"🃏",zone:{x:270,y:920,w:110,h:150}},
 ];
+const TOWER = {x:900,y:640,r:46}; // tháp ly sâm panh giữa sảnh
 booths.forEach(b => solids.push({x:b.x,y:b.y,w:b.w,h:b.h}));
 const zones = [{id:"stage",x:600,y:250,w:600,h:120}, ...booths.map(b => ({id:b.id, ...b.zone}))];
 const tables = [[620,580],[1180,580],[720,780],[1080,780]].map(([x,y]) => ({x,y,r:34}));
 const plants = [[80,80],[W-80,80],[80,H-80],[W-80,H-80],[560,100],[1240,100]];
-const ZNAME = {stage:"Sân khấu",food:"Tiệc giao lưu",drink:"Quầy đồ uống",photo:"Photo booth",gift:"Quà tặng",checkin:"Đón khách",wheel:"Vòng quay"};
+const ZNAME = {stage:"Sân khấu",food:"Tiệc giao lưu",drink:"Quầy đồ uống",photo:"Photo booth",gift:"Quà tặng",checkin:"Đón khách",wheel:"Vòng quay",cards:"Quầy trò chơi"};
 const zoneName = id => ZNAME[id] || "";
 
 const store = {
@@ -470,19 +515,20 @@ function onPeerChange(p){
   if(p.sameTab) return;
   const pr = p.presence, n = cleanName(pr.n); if(!n) return;
   const s = seen.get(p.peer);
-  const sayT = num(pr.sayT,0,1e15,0), winT = num(pr.winT,0,1e15,0), st = num(pr.st,0,6,0), actT = num(pr.actT,0,1e15,0);
-  if(!s){ seen.set(p.peer,{sayT,winT,st,actT}); sysLog(n+" vừa tới sự kiện"); return; }
+  const sayT = num(pr.sayT,0,1e15,0), winT = num(pr.winT,0,1e15,0), st = num(pr.st,0,6,0), actT = num(pr.actT,0,1e15,0), cardT = num(pr.cardT,0,1e15,0);
+  if(!s){ seen.set(p.peer,{sayT,winT,st,actT,cardT}); sysLog(n+" vừa tới sự kiện"); return; }
+  if(cardT > (s.cardT||0) && typeof pr.cardMsg === "string" && pr.cardMsg) sysLog(n+" "+pr.cardMsg.slice(0,80));
   if(actT > s.actT && Object.prototype.hasOwnProperty.call(ACTS, pr.act)) handleRemoteAct(p, n, pr.act, typeof pr.actTo==="string" ? pr.actTo.slice(0,64) : "");
   if(sayT > s.sayT && typeof pr.say === "string" && pr.say) addLog(n, cleanColor(pr.c), pr.say.slice(0,120));
   if(winT > s.winT && typeof pr.win === "string" && pr.win){ const msg = n+" vừa trúng "+pr.win.slice(0,40)+" ở Vòng quay!"; sysLog("🎉 "+msg); toast("🎉 "+msg); }
   if(st === 6 && s.st < 6) sysLog(n+" đã sưu tập đủ 6 dấu mộc");
-  seen.set(p.peer,{sayT,winT,st,actT});
+  seen.set(p.peer,{sayT,winT,st,actT,cardT});
 }
 
 function pushPresence(force){
   if(!room || !me.joined) return;
   const now = performance.now();
-  const p = {n:me.name,c:me.c,a:me.a,g:me.g,x:Math.round(me.x),y:Math.round(me.y),d:Math.round(me.dir*100)/100,m:me.moving?1:0,z:me.zone||"",da:me.dance?1:0,st:me.stamps.size,say:me.say,sayT:me.sayT,emo:me.emo,emoT:me.emoT,win:me.spun||"",winT:store.get("spunT",0),act:me.act,actT:me.actT,actTo:me.actTo};
+  const p = {n:me.name,c:me.c,a:me.a,g:me.g,x:Math.round(me.x),y:Math.round(me.y),d:Math.round(me.dir*100)/100,m:me.moving?1:0,z:me.zone||"",da:me.dance?1:0,st:me.stamps.size,say:me.say,sayT:me.sayT,emo:me.emo,emoT:me.emoT,win:me.spun||"",winT:store.get("spunT",0),act:me.act,actT:me.actT,actTo:me.actTo,xu:xu,cardT:me.cardT||0,cardMsg:me.cardMsg||""};
   const key = JSON.stringify(p);
   if(key === lastSent) return;
   if(!force && now - lastPush < 70) return;
@@ -492,33 +538,33 @@ function pushPresence(force){
 
 function renderPeople(){
   const list = [];
-  if(me.joined) list.push({me:true,n:me.name,c:me.c,st:me.stamps.size,z:me.zone,g:me.g});
-  visiblePeers().forEach(p => { if(p.sameTab) return; list.push({me:false,n:cleanName(p.presence.n),c:cleanColor(p.presence.c),st:num(p.presence.st,0,6,0),z:typeof p.presence.z==="string"?p.presence.z:"",g:cleanG(p.presence.g),other:p.isMe}); });
+  if(me.joined) list.push({me:true,n:me.name,c:me.c,st:me.stamps.size,z:me.zone,g:me.g,xu});
+  visiblePeers().forEach(p => { if(p.sameTab) return; list.push({me:false,n:cleanName(p.presence.n),c:cleanColor(p.presence.c),st:num(p.presence.st,0,6,0),z:typeof p.presence.z==="string"?p.presence.z:"",g:cleanG(p.presence.g),other:p.isMe,xu:num(p.presence.xu,0,1e9,1000)}); });
   list.sort((a,b) => (b.me-a.me) || (b.st-a.st));
   $("people").replaceChildren(...list.map(i => {
     const li = document.createElement("li"); if(i.me) li.className="me";
     const s = document.createElement("span"); s.className="sw"; s.style.background=i.c;
     const nm = document.createElement("span"); nm.className="nm"; nm.textContent = (i.g==="f"?"👗 ":"🤵 ") + i.n + (i.me?" (bạn)":"") + (i.other?" (tab khác)":"");
-    const mt = document.createElement("span"); mt.className="meta"; mt.textContent = (i.z?zoneName(i.z)+" · ":"") + i.st+"/6";
+    const mt = document.createElement("span"); mt.className="meta"; mt.textContent = (i.z?zoneName(i.z)+" · ":"") + i.st+"/6 · 🪙"+Math.round(i.xu).toLocaleString("vi-VN");
     li.append(s,nm,mt); return li;
   }));
   $("peopleTitle").textContent = "Khách đang có mặt (" + list.length + ")";
   if(room && room.connected()) updateOnlineTxt();
 }
 
-// ---- NPCs ----
+// ---- NPC: chỉ còn ban nhạc trên sân khấu ----
 const npcs = [
-  {n:"Lễ tân Hà",c:"#ffffff",a:"bow",g:"f",x:650,y:1050,dir:-Math.PI/2,fixed:true,lines:["Chào mừng quý khách tới lễ khai trương!","Mời bạn check-in tại đây ạ."]},
-  {n:"MC Tuấn",c:"#7a1d12",a:"none",g:"m",x:900,y:200,dir:Math.PI/2,fixed:true,dance:true,onStage:true,lines:["Xin chào quý vị khách quý!","10 giờ chúng ta cùng cắt băng khai trương!","Một tràng pháo tay nào!"]},
-  {n:"Khách mời Lan",c:"#b3201b",a:"crown",g:"f",x:760,y:660,lines:["Trụ sở mới đẹp quá!","Chúc mừng khai trương hồng phát!"]},
-  {n:"Khách mời Bảo",c:"#ffffff",a:"glasses",g:"m",x:1150,y:700,lines:["Tiệc giao lưu bên trái ngon lắm!","Ai chụp ảnh chung không?"]},
-  {n:"Khách mời Vy",c:"#e9a3a3",a:"none",g:"f",x:1000,y:470,lines:["Dresscode trắng đỏ xinh ghê!","Sắp tới giờ cắt băng rồi!"]},
+  {n:"Ca sĩ Ngọc",c:"#b3201b",a:"none",g:"f",x:900,y:222,role:"sing",lines:["Quẩy lên nào cả sảnh ơi!","Chúc mừng khai trương NewstarGroup!","Giơ tay lên nào! 🙌","Một, hai, ba… nhảy!"]},
+  {n:"Guitar Huy",c:"#1f1715",a:"glasses",g:"m",x:785,y:205,role:"guitar",lines:["Yeah! 🎸","Solo nè!"]},
+  {n:"Bass Khoa",c:"#ffffff",a:"hat",g:"m",x:1015,y:205,role:"bass",lines:["Bass căng chưa! 🔊"]},
+  {n:"Trống Long",c:"#7a1d12",a:"none",g:"m",x:690,y:150,role:"drums",lines:["Bùm chát bùm chát! 🥁"]},
+  {n:"Keyboard Mai",c:"#f3e6d3",a:"bow",g:"f",x:1110,y:150,role:"keys",lines:["Lên nhạc nào! 🎹"]},
 ];
-npcs.forEach(n => { n.moving=false; n.tx=n.x; n.ty=n.y; n.wait=Math.random()*3; n.say=""; n.sayT=0; n.emo=""; n.emoT=0; n.nextSay=3+Math.random()*8; });
+npcs.forEach(n => { n.dir=Math.PI/2; n.fixed=true; n.onStage=true; n.moving=false; n.tx=n.x; n.ty=n.y; n.wait=Math.random()*3; n.say=""; n.sayT=0; n.emo=""; n.emoT=0; n.nextSay=3+Math.random()*8; });
 function updateNpcs(dt){
   for(const n of npcs){
     n.nextSay -= dt;
-    if(n.nextSay<=0){ n.say = n.lines[Math.floor(Math.random()*n.lines.length)]; n.sayT = Date.now(); n.nextSay = 9+Math.random()*12; }
+    if(n.nextSay<=0){ n.say = n.lines[Math.floor(Math.random()*n.lines.length)]; n.sayT = Date.now(); n.nextSay = n.role==="sing" ? 7+Math.random()*6 : 18+Math.random()*20; }
     if(n.fixed) continue;
     if(n.wait>0){ n.wait-=dt; n.moving=false; continue; }
     const dx=n.tx-n.x, dy=n.ty-n.y, d=Math.hypot(dx,dy);
@@ -534,6 +580,7 @@ function pickFree(){ for(let i=0;i<20;i++){ const x=420+Math.random()*960, y=420
 function collides(x,y){
   for(const s of solids){ if(x+R>s.x && x-R<s.x+s.w && y+R*0.6>s.y && y-R*0.6<s.y+s.h) return true; }
   for(const t of tables){ if(Math.hypot(x-t.x,y-t.y) < t.r+R-2) return true; }
+  if(Math.hypot(x-TOWER.x,y-TOWER.y) < TOWER.r+R-2) return true;
   return false;
 }
 function moveWithCollide(o,dx,dy){
@@ -545,7 +592,7 @@ const inRect = (x,y,r) => x>=r.x && x<=r.x+r.w && y>=r.y && y<=r.y+r.h;
 
 const keys = new Set();
 const typing = () => document.activeElement && document.activeElement.tagName==="INPUT";
-const modalOpen = () => !$("joinModal").hidden || !$("wheelModal").hidden || !$("photoModal").hidden;
+const modalOpen = () => !$("joinModal").hidden || !$("wheelModal").hidden || !$("photoModal").hidden || !$("cardModal").hidden;
 addEventListener("keydown", e => {
   if(typing()) { if(e.key==="Escape") document.activeElement.blur(); return; }
   if(modalOpen()) return;
@@ -554,6 +601,7 @@ addEventListener("keydown", e => {
   if(k==="e" || k===" "){ e.preventDefault(); doAction(); }
   if(k==="enter"){ e.preventDefault(); $("side").classList.add("open"); $("chatInput").focus(); }
   if(/^[1-5]$/.test(k)) emote(EMOTES[+k-1]);
+  if(k==="v") setFP(!cam.fp);
   const ak = Object.keys(ACTS).find(a => ACTS[a].key===k); if(ak) doInteract(ak);
 });
 addEventListener("keyup", e => keys.delete(e.key.toLowerCase()));
@@ -578,13 +626,96 @@ function doAction(){
   else if(z==="stage"){ me.dance = !me.dance; stamp("stage"); toast(me.dance ? "Bạn đang quẩy trước sân khấu 💃" : "Bạn dừng nhảy"); pushPresence(true); }
   else if(z==="photo"){ stamp("photo"); openPhoto(); }
   else if(z==="wheel"){ if(me.stamps.size<6){ toast("Cần đủ 6 dấu mộc mới được quay ("+me.stamps.size+"/6)"); return; } openWheel(); }
+  else if(z==="cards"){ openCards(); }
 }
+
+// ---- Quầy trò chơi: xì dách với nhà cái ----
+const SUITS = ["♠","♥","♦","♣"], RANKS = ["A","2","3","4","5","6","7","8","9","10","J","Q","K"];
+const SPECIAL = {xiban:{rank:3,name:"Xì bàn"}, xidach:{rank:2,name:"Xì dách"}, ngulinh:{rank:1,name:"Ngũ linh"}};
+let xu = store.get("xu", 1000);
+const bj = {deck:[], p:[], d:[], bet:50, state:"bet"};
+function newDeck(){ const d=[]; for(const s of SUITS) for(const r of RANKS) d.push({r,s}); for(let i=d.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [d[i],d[j]]=[d[j],d[i]]; } return d; }
+function score(h){ let t=0, a=0; for(const c of h){ if(c.r==="A"){ a++; t+=1; } else if(["10","J","Q","K"].includes(c.r)) t+=10; else t+=+c.r; } while(a>0 && t+10<=21){ t+=10; a--; } return t; }
+function special(h){
+  const ten = c => ["10","J","Q","K"].includes(c.r);
+  if(h.length===2){ if(h[0].r==="A" && h[1].r==="A") return "xiban"; if((h[0].r==="A"&&ten(h[1]))||(h[1].r==="A"&&ten(h[0]))) return "xidach"; }
+  if(h.length===5 && score(h)<=21) return "ngulinh";
+  return null;
+}
+function cardEl(c, hidden){
+  const d = document.createElement("div");
+  if(hidden){ d.className="pc back"; d.setAttribute("aria-label","Lá bài úp"); return d; }
+  d.className = "pc" + (c.s==="♥"||c.s==="♦" ? " red" : "");
+  d.setAttribute("aria-label", c.r+c.s);
+  const a=document.createElement("span"); a.textContent=c.r;
+  const s=document.createElement("span"); s.className="s"; s.textContent=c.s;
+  const b=document.createElement("span"); b.className="b"; b.textContent=c.r;
+  d.append(a,s,b); return d;
+}
+const betBtns = {};
+[10,50,100,200].forEach(v => { const b=document.createElement("button"); b.type="button"; b.textContent=v; b.setAttribute("aria-label","Cược "+v+" xu"); b.onclick=()=>{ if(bj.state==="play") return; bj.bet=v; renderCards(); }; $("betRow").appendChild(b); betBtns[v]=b; });
+function renderCards(){
+  const playing = bj.state==="play";
+  $("xuTxt").textContent = xu.toLocaleString("vi-VN");
+  $("pCards").replaceChildren(...bj.p.map(c=>cardEl(c,false)));
+  $("dCards").replaceChildren(...bj.d.map((c,i)=>cardEl(c, playing && i===1)));
+  $("pScore").textContent = bj.p.length ? score(bj.p)+" điểm" : "";
+  $("dScore").textContent = bj.d.length ? (playing ? "?" : score(bj.d)+" điểm") : "";
+  for(const v in betBtns){ betBtns[v].setAttribute("aria-pressed", String(+v===bj.bet)); betBtns[v].disabled = playing || +v>xu; }
+  $("dealBtn").hidden = playing; $("dealBtn").textContent = bj.state==="done" ? "Ván mới" : "Chia bài";
+  $("dealBtn").disabled = xu < bj.bet;
+  $("hitBtn").hidden = $("standBtn").hidden = !playing;
+  $("refillBtn").hidden = !(xu < 10 && !playing);
+}
+function openCards(){ $("cardModal").hidden = false; if(bj.bet > xu) bj.bet = [200,100,50,10].find(v=>v<=xu) || 10; renderCards(); }
+function bjDeal(){
+  if(xu < bj.bet){ $("bjMsg").textContent = "Không đủ xu cho mức cược này."; return; }
+  bj.deck = newDeck(); bj.p = [bj.deck.pop(), bj.deck.pop()]; bj.d = [bj.deck.pop(), bj.deck.pop()]; bj.state = "play";
+  $("bjMsg").textContent = "Rút thêm hay dằn? (cần ít nhất 16 điểm để dằn)";
+  if(special(bj.p) || special(bj.d)) return bjResolve();
+  renderCards();
+}
+function bjHit(){
+  if(bj.state!=="play") return;
+  bj.p.push(bj.deck.pop());
+  if(score(bj.p) > 21 || bj.p.length===5) return bjResolve();
+  renderCards();
+}
+function bjStand(){
+  if(bj.state!=="play") return;
+  if(score(bj.p) < 16){ $("bjMsg").textContent = "Chưa đủ tuổi! Cần ít nhất 16 điểm mới được dằn."; return; }
+  while(score(bj.d) < 16 && bj.d.length < 5) bj.d.push(bj.deck.pop());
+  bjResolve();
+}
+function bjResolve(){
+  const ps = special(bj.p), ds = special(bj.d), pv = score(bj.p), dv = score(bj.d);
+  let res, why;
+  if(ps || ds){
+    const a = ps ? SPECIAL[ps].rank : 0, b = ds ? SPECIAL[ds].rank : 0;
+    res = a>b ? "win" : a<b ? "lose" : "draw";
+    why = res==="win" ? "Bạn có "+SPECIAL[ps].name+"!" : res==="lose" ? "Nhà cái có "+SPECIAL[ds].name+"." : "Cả hai cùng "+SPECIAL[ps].name+".";
+  } else if(pv>21 && dv>21){ res="draw"; why="Cả hai cùng quắc."; }
+  else if(pv>21){ res="lose"; why="Bạn quắc ("+pv+" điểm)."; }
+  else if(dv>21){ res="win"; why="Nhà cái quắc ("+dv+" điểm)."; }
+  else { res = pv>dv ? "win" : pv<dv ? "lose" : "draw"; why = pv+" so với "+dv+" điểm."; }
+  const mult = res==="win" && ps ? 2 : 1;
+  const delta = res==="win" ? bj.bet*mult : res==="lose" ? -bj.bet : 0;
+  xu = Math.max(0, xu + delta); store.set("xu", xu);
+  bj.state = "done";
+  $("bjMsg").textContent = (res==="win" ? "🎉 Thắng +"+delta+" xu. " : res==="lose" ? "Thua "+(-delta)+" xu. " : "Hòa. ") + why;
+  renderCards();
+  if(res==="win" && (ps || delta>=100)){ me.cardMsg = "thắng "+(ps?SPECIAL[ps].name+" ":"")+"+"+delta+" xu ở Quầy trò chơi 🃏"; me.cardT = Date.now(); }
+  pushPresence(true); renderPeople();
+}
+$("dealBtn").onclick = bjDeal; $("hitBtn").onclick = bjHit; $("standBtn").onclick = bjStand;
+$("refillBtn").onclick = () => { xu += 500; store.set("xu",xu); $("bjMsg").textContent = "Nhà cái tặng bạn 500 xu. Chúc may mắn!"; renderCards(); pushPresence(true); };
+$("cardClose").onclick = () => { if(bj.state==="play"){ $("bjMsg").textContent = "Đang giữa ván, hãy dằn hoặc rút cho xong nhé."; return; } $("cardModal").hidden = true; };
 const actionBtn = $("actionBtn");
 actionBtn.onclick = doAction;
 function updateActionBtn(){
   if(!me.joined || !me.zone){ actionBtn.hidden = true; return; }
   actionBtn.hidden = false;
-  const labels = {checkin:"Check-in",food:"Dùng tiệc",drink:"Lấy đồ uống",gift:"Nhận quà",stage:me.dance?"Dừng nhảy":"Quẩy trước sân khấu",photo:"Chụp ảnh",wheel:"Quay thưởng"};
+  const labels = {checkin:"Check-in",food:"Dùng tiệc",drink:"Lấy đồ uống",gift:"Nhận quà",stage:me.dance?"Dừng nhảy":"Quẩy trước sân khấu",photo:"Chụp ảnh",wheel:"Quay thưởng",cards:"Ngồi vào bàn bài"};
   const t = labels[me.zone] + " (E)"; if(actionBtn.textContent!==t) actionBtn.textContent = t;
 }
 
@@ -890,12 +1021,75 @@ function buildScene(){
       box(0.12,2.6,0.12,goldM(),front+dv*0.1,1.3,bz+0.1); box(0.12,2.6,0.12,goldM(),front+dv*0.1,1.3,bz+bd-0.1);
       const aw = new T.Mesh(new T.BoxGeometry(1.1,0.12,bd), [cream,cream,sm,cream,cream,cream]); aw.position.set(front+dv*0.5,2.65,cz); aw.rotation.z = side==="right" ? 0.25 : -0.25; scene.add(aw);
     }
-    for(let i=0;i<4;i++){ const g=new T.Mesh(new T.CylinderGeometry(0.1,0.12,0.28,12), mat(["#b3201b","#fffaf3","#c99a52","#7a1d12"][i]));
+    if(b.id!=="cards" && b.id!=="drink") for(let i=0;i<4;i++){ const g=new T.Mesh(new T.CylinderGeometry(0.1,0.12,0.28,12), mat(["#b3201b","#fffaf3","#c99a52","#7a1d12"][i]));
       if(side==="top") g.position.set(cx-1.2+i*0.8,1.2,bz+0.4); else g.position.set((side==="right"?bx+bw-0.4:bx+0.4),1.2,cz-1.2+i*0.8); scene.add(g); }
     const sign = textSprite([b.icon+" "+b.title],{font:"700 32px "+SANS+","+EMOJI_FONT,fg:"#fffaf3",bg:b.color,ppu:100,pad:14});
     const sp = side==="top" ? [cx,3.15,bz+0.6] : [(side==="right"?bx+bw-0.6:bx+0.6),3.15,cz];
     sign.position.set(...sp); scene.add(sign);
   });
+
+  // ---- ly: tháp sâm panh + cụm ly trên bàn ----
+  const glassM = new T.MeshStandardMaterial({color:"#ffffff",transparent:true,opacity:0.32,roughness:0.05,metalness:0.1,side:T.DoubleSide,depthWrite:false});
+  const wineM = new T.MeshStandardMaterial({color:"#e8c26a",transparent:true,opacity:0.85,roughness:0.2,emissive:"#5a3a08",emissiveIntensity:0.25});
+  const V2 = (x,y) => new T.Vector2(x,y);
+  const coupeG = new T.LatheGeometry([V2(0,0),V2(0.075,0),V2(0.075,0.01),V2(0.01,0.025),V2(0.01,0.13),V2(0.04,0.15),V2(0.1,0.18),V2(0.115,0.22)],18);
+  const coupeWine = new T.CylinderGeometry(0.105,0.05,0.04,18);
+  const fluteG = new T.LatheGeometry([V2(0,0),V2(0.055,0),V2(0.055,0.01),V2(0.009,0.02),V2(0.009,0.12),V2(0.032,0.15),V2(0.042,0.25),V2(0.038,0.32)],16);
+  const fluteWine = new T.CylinderGeometry(0.037,0.028,0.12,14);
+  function coupe(parent,x,y,z){ const g=new T.Mesh(coupeG,glassM); g.position.set(x,y,z); parent.add(g); const w=new T.Mesh(coupeWine,wineM); w.position.set(x,y+0.19,z); parent.add(w); }
+  function flute(parent,x,y,z){ const g=new T.Mesh(fluteG,glassM); g.position.set(x,y,z); parent.add(g); const w=new T.Mesh(fluteWine,wineM); w.position.set(x,y+0.21,z); parent.add(w); }
+  // tháp ly 5 tầng giữa sảnh
+  const tw = new T.Group(); tw.position.set(X(TOWER.x),0,Z(TOWER.y)); scene.add(tw);
+  const tCloth = new T.Mesh(new T.CylinderGeometry(1.05,1.15,0.9,32), mat("#fffaf3")); tCloth.position.y=0.45; tw.add(tCloth);
+  const tSkirt = new T.Mesh(new T.CylinderGeometry(1.16,1.16,0.18,32,1,true), silkM()); tSkirt.position.y=0.8; tw.add(tSkirt);
+  const tray = new T.Mesh(new T.CylinderGeometry(0.85,0.85,0.03,32), goldM()); tray.position.y=0.92; tw.add(tray);
+  for(let k=0;k<5;k++){
+    const n = 5-k, sp = 0.235, y = 0.935 + k*0.22;
+    for(let i=0;i<n;i++) for(let j=0;j<n;j++) coupe(tw, (i-(n-1)/2)*sp, y, (j-(n-1)/2)*sp);
+  }
+  const bottle = new T.Group(); bottle.position.set(0.62,0.935,0.45); bottle.rotation.z = -0.25; tw.add(bottle);
+  const bBody = new T.Mesh(new T.CylinderGeometry(0.075,0.08,0.34,16), mat("#1d3b26",{roughness:0.2,metalness:0.3})); bBody.position.y=0.17; bottle.add(bBody);
+  const bNeck = new T.Mesh(new T.CylinderGeometry(0.03,0.07,0.2,14), goldM()); bNeck.position.y=0.44; bottle.add(bNeck);
+  const twSign = textSprite(["🥂 Tháp ly sâm panh"],{font:"700 24px "+SANS,fg:"#7a1d12",bg:"rgba(255,250,243,0.92)",ppu:170}); twSign.position.set(0,2.12,0); tw.add(twSign);
+  // cụm ly trên các bàn tròn
+  tables.forEach((t,ti) => {
+    const g = new T.Group(); g.position.set(X(t.x),0.96,Z(t.y)); scene.add(g);
+    for(let i=0;i<6;i++){ const a = i/6*Math.PI*2 + ti; flute(g, Math.cos(a)*0.42, 0, Math.sin(a)*0.42); }
+  });
+  // cụm ly trên quầy đồ uống
+  { const b = booths.find(b=>b.id==="drink"), g = new T.Group(); g.position.set(X(b.x+b.w)-0.4,1.06,Z(b.y)+0.9); scene.add(g);
+    for(let i=0;i<10;i++) flute(g, (i%2)*0.13, 0, Math.floor(i/2)*0.42 - 0.2); }
+
+  // ---- ban nhạc: trống, keyboard, micro ----
+  const stY = 0.72, stageM = mat("#1f1715",{roughness:0.4});
+  { const dr = npcs.find(n=>n.role==="drums"), g = new T.Group(); g.position.set(X(dr.x), stY, Z(dr.y)+0.62); scene.add(g);
+    const shell = mat("#b3201b",{roughness:0.3,metalness:0.2}), head = mat("#fffaf3"), cym = goldM();
+    const kick = new T.Mesh(new T.CylinderGeometry(0.34,0.34,0.32,24), shell); kick.rotation.x=Math.PI/2; kick.position.set(0,0.34,0.1); g.add(kick);
+    const kHead = new T.Mesh(new T.CircleGeometry(0.3,24), head); kHead.position.set(0,0.34,0.27); g.add(kHead);
+    [[-0.38,0.62,-0.05,0.17],[0.38,0.6,-0.05,0.16],[-0.16,0.78,0.05,0.13],[0.16,0.78,0.05,0.13]].forEach(([x,y,z,r]) => { const d=new T.Mesh(new T.CylinderGeometry(r,r,0.16,20), shell); d.position.set(x,y,z); g.add(d); const h=new T.Mesh(new T.CylinderGeometry(r*0.98,r*0.98,0.01,20), head); h.position.set(x,y+0.085,z); g.add(h); });
+    [[-0.55,1.15],[0.6,1.2]].forEach(([x,y]) => { const s=new T.Mesh(new T.CylinderGeometry(0.012,0.012,y,6), stageM); s.position.set(x,y/2,-0.1); g.add(s); const c=new T.Mesh(new T.CylinderGeometry(0.26,0.26,0.012,24), cym); c.position.set(x,y,-0.1); c.rotation.x=0.2; g.add(c); });
+    const logo = textSprite(["NEWSTAR BAND"],{font:"800 22px "+SANS,fg:"#fffaf3",bg:"#7a1d12",ppu:160}); logo.position.set(0,0.27,0.3); g.add(logo); }
+  { const kb = npcs.find(n=>n.role==="keys"), g = new T.Group(); g.position.set(X(kb.x), stY, Z(kb.y)+0.5); scene.add(g);
+    [-0.35,0.35].forEach(x => { const l=new T.Mesh(new T.BoxGeometry(0.04,0.85,0.04), stageM); l.position.set(x,0.42,0); l.rotation.z = x>0?0.35:-0.35; g.add(l); });
+    const body = new T.Mesh(new T.BoxGeometry(1.0,0.08,0.3), stageM); body.position.y=0.88; g.add(body);
+    const keys = new T.Mesh(new T.BoxGeometry(0.92,0.02,0.14), mat("#fffaf3")); keys.position.set(0,0.93,0.06); g.add(keys);
+    for(let i=0;i<14;i++){ const bk=new T.Mesh(new T.BoxGeometry(0.03,0.025,0.08), stageM); bk.position.set(-0.43+i*0.066,0.945,0.03); if(i%7!==2 && i%7!==6) g.add(bk); } }
+  { const sg = npcs.find(n=>n.role==="sing"), g = new T.Group(); g.position.set(X(sg.x)+0.35, stY, Z(sg.y)+0.45); scene.add(g);
+    const pole=new T.Mesh(new T.CylinderGeometry(0.015,0.015,1.35,8), stageM); pole.position.y=0.67; g.add(pole);
+    const base=new T.Mesh(new T.CylinderGeometry(0.18,0.2,0.03,16), stageM); base.position.y=0.015; g.add(base); }
+  // loa monitor trước sân khấu
+  [-1,1].forEach(s => { const m=new T.Mesh(new T.BoxGeometry(0.6,0.35,0.4), stageM); m.position.set(X(900)+s*2.2, stY+0.17, Z(STAGE.y+STAGE.h)-0.35); m.rotation.x=-0.35; scene.add(m); });
+
+  // ---- quầy trò chơi: lá bài lớn, chồng chip ----
+  { const b = booths.find(b=>b.id==="cards");
+    const bigCard = (rank,suit,red) => canvasTex(256,360,g=>{ g.fillStyle="#fffaf3"; rr(g,4,4,248,352,22); g.fill(); g.strokeStyle="#c99a52"; g.lineWidth=6; rr(g,14,14,228,332,16); g.stroke();
+      g.fillStyle=red?"#b3201b":"#1f1715"; g.font="800 56px "+SANS; g.textAlign="left"; g.fillText(rank,30,80); g.font="150px "+SANS; g.textAlign="center"; g.fillText(suit,128,240); });
+    [["A","♠",false,-0.55,0.15],["K","♥",true,0.55,-0.15]].forEach(([r,s,red,dz,rot]) => {
+      const m = new T.Mesh(new T.PlaneGeometry(1.0,1.4), new T.MeshBasicMaterial({map:bigCard(r,s,red),toneMapped:false,side:T.DoubleSide}));
+      m.position.set(X(b.x)+0.32, 2.0, Z(b.y+b.h/2)+dz); m.rotation.y = Math.PI/2; m.rotation.x = rot; scene.add(m); });
+    const felt = new T.Mesh(new T.BoxGeometry(0.66,0.02,Z(b.h)-0.5), mat("#2f6b4c",{roughness:0.9})); felt.position.set(X(b.x+b.w)-0.4,1.07,Z(b.y+b.h/2)); scene.add(felt);
+    ["#b3201b","#1f1715","#c99a52","#fffaf3"].forEach((c,i) => { for(let k=0;k<4+i;k++){ const chip=new T.Mesh(new T.CylinderGeometry(0.07,0.07,0.025,16), mat(c)); chip.position.set(X(b.x+b.w)-0.4, 1.09+k*0.026, Z(b.y)+0.7+i*0.45); scene.add(chip); } });
+  }
 
   // zone markers
   zones.forEach(z => {
@@ -1033,6 +1227,14 @@ function makeAvatar(o,isMe){
   else if(a==="bow"){ [-1,1].forEach(s=>{ const c=new T.Mesh(new T.ConeGeometry(0.09,0.18,4),silkM()); c.rotation.z=s*Math.PI/2; c.position.set(0.12+s*0.09,1.53,0); body.add(c); }); }
   else if(a==="glasses"){ [-0.075,0.075].forEach(x=>{ const t=new T.Mesh(new T.TorusGeometry(0.055,0.012,6,16),dark); t.position.set(x,1.33,0.205); body.add(t); }); }
   else if(a==="crown"){ const gm=goldM(); const band=new T.Mesh(new T.CylinderGeometry(0.17,0.17,0.1,20,1,true),gm); band.position.y=1.53; body.add(band); for(let i=0;i<5;i++){ const sp=new T.Mesh(new T.ConeGeometry(0.04,0.12,6),gm); const ang=i/5*Math.PI*2; sp.position.set(Math.cos(ang)*0.17,1.63,Math.sin(ang)*0.17); body.add(sp); } }
+  if(o.role==="guitar" || o.role==="bass"){
+    const gt = new T.Group(); gt.position.set(0.02,0.78,0.2); gt.rotation.z = 0.95; body.add(gt);
+    const gb = new T.Mesh(new T.BoxGeometry(0.2,0.34,0.06), mat(o.role==="bass"?"#1f1715":"#b3201b",{roughness:0.3,metalness:0.2})); gt.add(gb);
+    const neck = new T.Mesh(new T.BoxGeometry(0.05,0.55,0.03), mat("#5b3b2a")); neck.position.y=0.43; gt.add(neck);
+    const headst = new T.Mesh(new T.BoxGeometry(0.08,0.1,0.03), dark); headst.position.y=0.74; gt.add(headst);
+  }
+  if(o.role==="sing"){ const mic=new T.Mesh(new T.CylinderGeometry(0.02,0.015,0.16,8), dark); mic.position.set(0,-0.52,0.04); mic.rotation.x=0.4; armR.add(mic); const ball=new T.Mesh(new T.SphereGeometry(0.035,10,8), mat("#9aa0a8",{metalness:0.6,roughness:0.3})); ball.position.set(0,-0.43,0.08); armR.add(ball); }
+  if(o.role==="drums"){ [armL,armR].forEach(a => { const st=new T.Mesh(new T.CylinderGeometry(0.01,0.012,0.36,6), mat("#e9d5bf")); st.position.set(0,-0.55,0.12); st.rotation.x=1.2; a.add(st); }); }
   const tag = textSprite([o.n],{font:"700 24px "+SANS,fg:isMe?"#fffaf3":"#fffaf3",bg:isMe?"#b3201b":"rgba(59,29,20,0.82)",ppu:110});
   tag.position.y=1.88; root.add(tag);
   scene.add(root);
@@ -1050,6 +1252,15 @@ function syncAvatar(av,o,x,y,t,dt,anim){
   if(o.dance){ const d=Math.sin(t/160+av.phase); av.body.position.y=Math.abs(d)*0.22; av.armL.rotation.z=-2.4-d*0.4; av.armR.rotation.z=2.4-d*0.4; av.armL.rotation.x=av.armR.rotation.x=0; av.body.rotation.y = Math.sin(t/300)*0.5; }
   else { av.body.position.y = Math.abs(sw)*0.05; av.armL.rotation.z=0.06; av.armR.rotation.z=-0.06; av.armL.rotation.x=-sw*0.6; av.armR.rotation.x=sw*0.6; av.body.rotation.y=0; }
   av.body.rotation.x = 0; av.body.rotation.z = 0;
+  if(o.role){ // ban nhạc nhún theo nhịp 128 BPM
+    const beat = t/468.75*Math.PI*2, bob = Math.abs(Math.sin(beat/2));
+    av.body.position.y = bob*0.1; av.body.rotation.y = 0; av.legL.rotation.x = av.legR.rotation.x = 0;
+    av.armL.rotation.set(0,0,0.06); av.armR.rotation.set(0,0,-0.06);
+    if(o.role==="sing"){ av.armR.rotation.x=-2.0; av.armR.rotation.z=0.25; av.armL.rotation.z=-2.2+Math.sin(beat)*0.45; av.body.rotation.y=Math.sin(beat/4)*0.3; }
+    else if(o.role==="guitar"||o.role==="bass"){ av.armL.rotation.x=-1.0; av.armL.rotation.z=0.55; av.armR.rotation.x=-0.75+Math.sin(beat*2)*0.35; av.body.rotation.y=Math.sin(beat/2)*0.22; av.body.rotation.z=Math.sin(beat/2)*0.06; }
+    else if(o.role==="drums"){ av.armL.rotation.x=-0.8-Math.max(0,Math.sin(beat*2))*0.7; av.armR.rotation.x=-0.8-Math.max(0,Math.sin(beat*2+Math.PI))*0.7; }
+    else if(o.role==="keys"){ av.armL.rotation.x=-1.1+Math.sin(beat*2)*0.12; av.armR.rotation.x=-1.1+Math.sin(beat*2+1.5)*0.12; av.body.rotation.x=0.08; }
+  }
   if(anim){ const k=(performance.now()-anim.t0)/1400; if(k<1) applyAnim(av,anim,k,t); }
   const now = Date.now();
   if(o.say && o.sayT && o.sayT!==av.bubbleT && now-o.sayT<7000){
@@ -1070,7 +1281,14 @@ let myAv = null;
 const npcAv = new Map(), remoteAv = new Map();
 
 // ---- camera (360° orbit) ----
-const cam = {yaw:0.6, pitch:0.5, dist:22, tx:X(900), ty:1.2, tz:Z(640), spin:0, shake:0};
+const cam = {yaw:0.6, pitch:0.5, dist:22, tx:X(900), ty:1.2, tz:Z(640), spin:0, shake:0, fp:false, fpPitch:0};
+function setFP(on){
+  if(!me.joined) return;
+  cam.fp = !!on;
+  $("fpBtn").setAttribute("aria-pressed", String(cam.fp));
+  if(cam.fp){ cam.fpPitch = 0; toast("Góc nhìn thứ nhất · kéo để nhìn quanh, V để quay lại"); }
+}
+$("fpBtn").onclick = () => setFP(!cam.fp);
 const canvasEl = renderer.domElement;
 const ptrs = new Map(); let dragMoved = 0, pinch0 = 0, dist0 = 0;
 canvasEl.addEventListener("pointerdown", e => { canvasEl.setPointerCapture(e.pointerId); ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY}); dragMoved=0; if(ptrs.size===2){ const [a,b]=[...ptrs.values()]; pinch0=Math.hypot(a.x-b.x,a.y-b.y); dist0=cam.dist; } $("side").classList.remove("open"); });
@@ -1079,7 +1297,10 @@ canvasEl.addEventListener("pointermove", e => {
   const dx=e.clientX-p.x, dy=e.clientY-p.y; p.x=e.clientX; p.y=e.clientY;
   if(ptrs.size===2){ const [a,b]=[...ptrs.values()]; const d=Math.hypot(a.x-b.x,a.y-b.y); if(pinch0) cam.dist=Math.max(3,Math.min(26,dist0*pinch0/d)); dragMoved+=99; return; }
   dragMoved += Math.abs(dx)+Math.abs(dy);
-  if(dragMoved>6){ canvasEl.classList.add("dragging"); cam.yaw -= dx*0.007; cam.pitch = Math.max(0.08, Math.min(1.4, cam.pitch + dy*0.005)); cam.spin=0; }
+  if(dragMoved>6){ canvasEl.classList.add("dragging"); cam.yaw -= dx*(cam.fp?0.005:0.007);
+    if(cam.fp) cam.fpPitch = Math.max(-0.8, Math.min(0.7, cam.fpPitch - dy*0.004));
+    else cam.pitch = Math.max(0.08, Math.min(1.4, cam.pitch + dy*0.005));
+    cam.spin=0; }
 });
 const endPtr = e => {
   if(!ptrs.has(e.pointerId)) return; ptrs.delete(e.pointerId); canvasEl.classList.remove("dragging");
@@ -1087,9 +1308,9 @@ const endPtr = e => {
   if(ptrs.size<2) pinch0=0;
 };
 canvasEl.addEventListener("pointerup", endPtr); canvasEl.addEventListener("pointercancel", endPtr);
-canvasEl.addEventListener("wheel", e => { e.preventDefault(); cam.dist = Math.max(3, Math.min(26, cam.dist*(1+Math.sign(e.deltaY)*0.1))); }, {passive:false});
+canvasEl.addEventListener("wheel", e => { e.preventDefault(); if(cam.fp){ if(e.deltaY>0) setFP(false); return; } cam.dist = Math.max(3, Math.min(26, cam.dist*(1+Math.sign(e.deltaY)*0.1))); }, {passive:false});
 $("zoomIn").onclick = () => cam.dist = Math.max(3, cam.dist*0.8);
-$("zoomOut").onclick = () => cam.dist = Math.min(26, cam.dist*1.25);
+$("zoomOut").onclick = () => { if(cam.fp) setFP(false); else cam.dist = Math.min(26, cam.dist*1.25); };
 $("spinBtn360").onclick = () => { cam.spin = Math.PI*2; };
 const ray = new T.Raycaster(), ndc = new T.Vector2(), floorPlane = new T.Plane(new T.Vector3(0,1,0),0), hit = new T.Vector3();
 function tapMove(e){
@@ -1106,11 +1327,25 @@ nearRing.rotation.x=-Math.PI/2; nearRing.visible=false; scene.add(nearRing);
 function updateCamera(dt){
   if(!me.joined) cam.yaw += dt*0.12;
   if(cam.spin>0){ const s=Math.min(cam.spin, dt*2.2); cam.yaw += s; cam.spin -= s; }
+  if(cam.fp && me.joined){ // góc nhìn thứ nhất: mắt nhân vật
+    const bob = me.moving ? Math.abs(Math.sin(performance.now()/95))*0.045 : 0;
+    const ex = X(me.x), ez = Z(me.y), ey = 1.5 + bob, cp = Math.cos(cam.fpPitch);
+    cam.tx = ex; cam.tz = ez;
+    camera.position.set(ex, ey, ez);
+    if(cam.shake>0){ cam.shake -= dt; const a = cam.shake*0.25; camera.position.x += (Math.random()-0.5)*a; camera.position.y += (Math.random()-0.5)*a; }
+    camera.lookAt(ex - Math.sin(cam.yaw)*cp, ey + Math.sin(cam.fpPitch), ez - Math.cos(cam.yaw)*cp);
+    return;
+  }
   const fx = me.joined ? X(me.x) : X(900), fz = me.joined ? Z(me.y) : Z(660);
   const k = Math.min(1, dt*8);
   cam.tx += (fx-cam.tx)*k; cam.tz += (fz-cam.tz)*k;
   const d = cam.dist;
   camera.position.set(cam.tx + Math.sin(cam.yaw)*Math.cos(cam.pitch)*d, cam.ty + Math.sin(cam.pitch)*d, cam.tz + Math.cos(cam.yaw)*Math.cos(cam.pitch)*d);
+  if(me.joined){ // giữ camera trong sảnh để không bị tường che
+    const m = 1.3;
+    camera.position.x = Math.max(m, Math.min(X(W)-m, camera.position.x));
+    camera.position.z = Math.max(m, Math.min(Z(H)-m, camera.position.z));
+  }
   if(cam.shake>0){ cam.shake -= dt; const a = cam.shake*0.35; camera.position.x += (Math.random()-0.5)*a; camera.position.y += (Math.random()-0.5)*a; }
   camera.lookAt(cam.tx, cam.ty, cam.tz);
 }
@@ -1130,7 +1365,7 @@ function update(dt){
     ix/=len; iy/=len; me.dir = Math.atan2(iy,ix);
     const ox=me.x, oy=me.y; moveWithCollide(me, ix*SPEED*dt, iy*SPEED*dt);
     if(target && Math.abs(me.x-ox)+Math.abs(me.y-oy)<0.05) target=null;
-  }
+  } else if(cam.fp && me.joined){ me.dir = Math.atan2(-Math.cos(cam.yaw), -Math.sin(cam.yaw)); } // đứng yên vẫn quay mặt theo hướng nhìn
   const z = zones.find(z => inRect(me.x,me.y,z)); const zid = me.joined && z ? z.id : null;
   if(zid !== me.zone){ me.zone = zid; if(zid!=="stage") me.dance=false; renderPeople(); pushPresence(true); }
   updateActionBtn();
@@ -1152,13 +1387,14 @@ function sync3D(dt,t){
     const key = me.name+"|"+me.c+"|"+me.a+"|"+me.g;
     if(!myAv || myAv.key!==key){ if(myAv) disposeAvatar(myAv); myAv = makeAvatar({n:me.name,c:me.c,a:me.a,g:me.g,dir:me.dir},true); }
     syncAvatar(myAv,me,me.x,me.y,t,dt,anims.get("me"));
+    myAv.root.visible = !cam.fp;
   }
   for(const [k,a] of anims) if(performance.now()-a.t0 > 1400) anims.delete(k);
   updateFx(dt);
   updateFireworks(performance.now(), dt);
   nearRing.visible = !!near;
   if(near){ nearRing.position.set(X(near.x),0.05,Z(near.y)); nearRing.rotation.z = t/600; }
-  npcs.forEach((n,i) => { let av=npcAv.get(i); if(!av){ av=makeAvatar({n:n.n+" · NPC",c:n.c,a:n.a,g:n.g,dir:n.dir},false); npcAv.set(i,av); } syncAvatar(av,n,n.x,n.y,t,dt,anims.get("npc:"+i)); if(n.onStage) av.root.position.y=0.72; });
+  npcs.forEach((n,i) => { let av=npcAv.get(i); if(!av){ av=makeAvatar({n:n.n+" 🎵",c:n.c,a:n.a,g:n.g,dir:n.dir,role:n.role},false); npcAv.set(i,av); } syncAvatar(av,n,n.x,n.y,t,dt,anims.get("npc:"+i)); if(n.onStage) av.root.position.y=0.72; });
   const alive = new Set();
   for(const p of peers){
     if(p.sameTab) continue; const pr=p.presence, n=cleanName(pr.n); if(!n) continue; const r=remotes.get(p.peer); if(!r) continue;
@@ -1188,7 +1424,7 @@ function drawMini(){
   mctx.fillStyle="#9e1b16"; mctx.fillRect(850*sx,370*sy,100*sx,(H-370)*sy);
   mctx.fillStyle="#5c160f"; mctx.fillRect(STAGE.x*sx,STAGE.y*sy,STAGE.w*sx,STAGE.h*sy);
   booths.forEach(b => { mctx.fillStyle=b.color; mctx.fillRect(b.x*sx,b.y*sy,b.w*sx,b.h*sy); });
-  mctx.fillStyle="#fffaf3"; mctx.strokeStyle="#c27b55"; tables.forEach(t => { mctx.beginPath(); mctx.arc(t.x*sx,t.y*sy,t.r*sx,0,7); mctx.fill(); mctx.stroke(); });
+  mctx.fillStyle="#fffaf3"; mctx.strokeStyle="#c27b55"; tables.concat([TOWER]).forEach(t => { mctx.beginPath(); mctx.arc(t.x*sx,t.y*sy,t.r*sx,0,7); mctx.fill(); mctx.stroke(); });
   npcs.forEach(n => { mctx.fillStyle="rgba(59,29,20,0.35)"; mctx.beginPath(); mctx.arc(n.x*sx,n.y*sy,5,0,7); mctx.fill(); });
   for(const p of peers){ if(p.sameTab) continue; const r=remotes.get(p.peer); if(!r) continue; mctx.fillStyle=cleanColor(p.presence.c); mctx.strokeStyle="#3b1d14"; mctx.lineWidth=1.5; mctx.beginPath(); mctx.arc(r.dx*sx,r.dy*sy,7,0,7); mctx.fill(); mctx.stroke(); }
   const px = (me.joined?me.x:cam.tx*U)*sx, py = (me.joined?me.y:cam.tz*U)*sy, va = Math.atan2(-Math.cos(cam.yaw), -Math.sin(cam.yaw));
