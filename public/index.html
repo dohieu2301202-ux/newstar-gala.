@@ -744,17 +744,19 @@ const viewEl = $("view");
 const renderer = new T.WebGLRenderer({antialias:true});
 renderer.setPixelRatio(Math.min(2, devicePixelRatio||1));
 renderer.outputEncoding = T.sRGBEncoding;
+renderer.toneMapping = T.ACESFilmicToneMapping;  // dịu vùng sáng, tránh chói
+renderer.toneMappingExposure = 0.85;
 viewEl.appendChild(renderer.domElement);
 const scene = new T.Scene();
-scene.background = new T.Color("#f3e9dc");
-scene.fog = new T.Fog("#f3e9dc", 34, 80);
+scene.background = new T.Color("#e6d8c6");
+scene.fog = new T.Fog("#e6d8c6", 34, 80);
 const camera = new T.PerspectiveCamera(55, 1, 0.1, 200);
 const X = x => x/U, Z = y => y/U;
 const col = h => new T.Color(h);
 
-scene.add(new T.HemisphereLight("#fff6ea", "#b89a80", 0.85));
-const sun = new T.DirectionalLight("#fff4e6", 0.6); sun.position.set(10,25,18); scene.add(sun);
-const warm = new T.PointLight("#ffcf9a", 0.7, 32); warm.position.set(X(900),6,Z(640)); scene.add(warm);
+scene.add(new T.HemisphereLight("#fff6ea", "#a88a72", 0.6));
+const sun = new T.DirectionalLight("#fff4e6", 0.4); sun.position.set(10,25,18); scene.add(sun);
+const warm = new T.PointLight("#ffcf9a", 0.3, 28); warm.position.set(X(900),6,Z(640)); scene.add(warm);
 
 function canvasTex(w,h,draw){ const c=document.createElement("canvas"); c.width=w; c.height=h; const g=c.getContext("2d"); draw(g,c); const t=new T.CanvasTexture(c); t.encoding=T.sRGBEncoding; t.anisotropy=4; return t; }
 const mat = (c,opts={}) => new T.MeshStandardMaterial({color:col(c), roughness:0.7, metalness:0.05, ...opts});
@@ -770,18 +772,18 @@ function textSprite(lines,{font="700 26px "+SANS,fg="#fffaf3",bg="rgba(122,29,18
   const w=Math.ceil(tw+pad*2), h=Math.ceil(lines.length*lh+pad*2-(lh-28)+(tail?14:0));
   const tex = canvasTex(w,h,(g)=>{ if(bg){ g.fillStyle=bg; rr(g,0,0,w,h-(tail?14:0),radius); g.fill(); if(tail){ g.beginPath(); g.moveTo(w/2-10,h-14); g.lineTo(w/2+10,h-14); g.lineTo(w/2,h); g.fill(); } }
     g.font=font; g.fillStyle=fg; g.textAlign="center"; g.textBaseline="top"; lines.forEach((l,i)=>g.fillText(l,w/2,pad+i*lh-2)); });
-  const s=new T.Sprite(new T.SpriteMaterial({map:tex,transparent:true,depthWrite:false}));
+  const s=new T.Sprite(new T.SpriteMaterial({map:tex,transparent:true,depthWrite:false,toneMapped:false}));
   s.scale.set(w/ppu,h/ppu,1); s.center.set(0.5,0); return s;
 }
 function emojiSprite(ch,size=0.7){
   const tex=canvasTex(128,128,g=>{ g.font="96px "+EMOJI_FONT; g.textAlign="center"; g.textBaseline="middle"; g.fillText(ch,64,72); });
-  const s=new T.Sprite(new T.SpriteMaterial({map:tex,transparent:true,depthWrite:false})); s.scale.set(size,size,1); return s;
+  const s=new T.Sprite(new T.SpriteMaterial({map:tex,transparent:true,depthWrite:false,toneMapped:false})); s.scale.set(size,size,1); return s;
 }
 const emojiCache = new Map();
 function fxSprite(ch,size){
   let tex = emojiCache.get(ch);
   if(!tex){ tex = canvasTex(128,128,g=>{ g.font="96px "+EMOJI_FONT; g.textAlign="center"; g.textBaseline="middle"; g.fillText(ch,64,72); }); emojiCache.set(ch,tex); }
-  const s = new T.Sprite(new T.SpriteMaterial({map:tex,transparent:true,depthWrite:false})); s.scale.set(size,size,1); return s;
+  const s = new T.Sprite(new T.SpriteMaterial({map:tex,transparent:true,depthWrite:false,toneMapped:false})); s.scale.set(size,size,1); return s;
 }
 
 // floor: champagne marble, copper medallion, red carpet
@@ -808,7 +810,7 @@ function scriptPanel(w,h,lines){
 }
 function buildScene(){
   if(built) return; built = true;
-  const floor = new T.Mesh(new T.PlaneGeometry(X(W),Z(H)), new T.MeshStandardMaterial({map:canvasTex(W,H,drawFloorTex), roughness:0.45, metalness:0.05}));
+  const floor = new T.Mesh(new T.PlaneGeometry(X(W),Z(H)), new T.MeshStandardMaterial({map:canvasTex(W,H,drawFloorTex), roughness:0.85, metalness:0}));
   floor.rotation.x = -Math.PI/2; floor.position.set(X(W)/2,0,Z(H)/2); scene.add(floor);
   const ground = new T.Mesh(new T.PlaneGeometry(200,200), mat("#e6d6c2")); ground.rotation.x=-Math.PI/2; ground.position.set(X(W)/2,-0.02,Z(H)/2); scene.add(ground);
   // walls
@@ -837,14 +839,14 @@ function buildScene(){
   // poster in the middle of the backdrop
   posterTex = new T.TextureLoader().load("poster.jpg", t => { t.encoding = T.sRGBEncoding; });
   box(4.25,4.35,0.12,goldM(),sx+sw/2,3.0,sz+0.33);
-  const poster = new T.Mesh(new T.PlaneGeometry(4.0,4.12), new T.MeshBasicMaterial({map:posterTex}));
+  const poster = new T.Mesh(new T.PlaneGeometry(4.0,4.12), new T.MeshBasicMaterial({map:posterTex,toneMapped:false}));
   poster.position.set(sx+sw/2,3.0,sz+0.4); scene.add(poster);
   // side panels with script titles
   const left = scriptPanel(512,512,(g,w)=>{ g.fillStyle="#c27b55"; g.font="140px "+SCRIPT; g.fillText("Khai",w/2,200); g.fillText("Trương",w/2,330); g.fillStyle="#7a1d12"; g.font="800 40px "+SANS; g.fillText("TRỤ SỞ MIỀN NAM",w/2,430); });
   const right = scriptPanel(512,512,(g,w)=>{ g.fillStyle="#7a1d12"; g.font="800 54px "+SANS; g.fillText("08:00",w/2,150); g.font="700 34px "+SANS; g.fillText("THỨ BẢY 28.11.2026",w/2,205);
     g.fillStyle="#c27b55"; g.font="80px "+SCRIPT; g.fillText("Agenda",w/2,300); g.fillStyle="#7a1d12"; g.font="600 26px "+SANS; g.fillText("Cắt băng · 10:00",w/2,355); g.fillText("Tiệc giao lưu · 10:30",w/2,395);
     g.fillStyle="#b3201b"; g.font="700 24px "+SANS; g.fillText("DRESSCODE: TRẮNG | ĐỎ",w/2,455); });
-  [[left,sx+2.6],[right,sx+sw-2.6]].forEach(([tex,x]) => { const m=new T.Mesh(new T.PlaneGeometry(3.8,3.8), new T.MeshBasicMaterial({map:tex})); m.position.set(x,3.0,sz+0.32); scene.add(m); });
+  [[left,sx+2.6],[right,sx+sw-2.6]].forEach(([tex,x]) => { const m=new T.Mesh(new T.PlaneGeometry(3.8,3.8), new T.MeshBasicMaterial({map:tex,toneMapped:false})); m.position.set(x,3.0,sz+0.32); scene.add(m); });
   // silk drapes on stage corners
   ribbon([[sx+0.2,5.5,sz+0.4],[sx+1.2,4.2,sz+0.6],[sx+0.4,2.6,sz+0.5],[sx+1.0,0.8,sz+0.7]],0.16);
   ribbon([[sx+sw-0.2,5.5,sz+0.4],[sx+sw-1.2,4.2,sz+0.6],[sx+sw-0.4,2.6,sz+0.5],[sx+sw-1.0,0.8,sz+0.7]],0.16);
@@ -852,13 +854,13 @@ function buildScene(){
   box(0.25,6.4,0.25,goldM(),sx+0.3,3.2,sz+sd); box(0.25,6.4,0.25,goldM(),sx+sw-0.3,3.2,sz+sd); box(sw,0.25,0.25,goldM(),sx+sw/2,6.4,sz+sd);
   const bulbGeo = new T.SphereGeometry(0.09,8,8);
   for(let i=0;i<30;i++){ const b=new T.Mesh(bulbGeo,new T.MeshBasicMaterial({color:"#f3c34b"})); b.position.set(sx+0.3+i*(sw-0.6)/29,0.6,sz+sd+0.03); scene.add(b); bulbs.push(b); }
-  ["#ffd9a0","#ff8c7a","#fff1d6","#ffb36b"].forEach((c,i) => {
+  ["#e8b98a","#d98276","#e9d2b0","#e0a26a"].forEach((c,i) => {
     const pivot = new T.Group(); pivot.position.set(sx+2+i*(sw-4)/3,6.3,sz+sd); scene.add(pivot);
-    const cone = new T.Mesh(new T.ConeGeometry(1.8,7,24,1,true), new T.MeshBasicMaterial({color:c,transparent:true,opacity:0.16,blending:T.AdditiveBlending,depthWrite:false,side:T.DoubleSide}));
+    const cone = new T.Mesh(new T.ConeGeometry(1.5,7,24,1,true), new T.MeshBasicMaterial({color:c,transparent:true,opacity:0.07,depthWrite:false,side:T.DoubleSide,toneMapped:false}));
     cone.position.y=-3.5; pivot.add(cone); pivot.add(new T.Mesh(new T.CylinderGeometry(0.2,0.25,0.4,12), mat("#3b1d14")));
     beams.push({pivot,i});
   });
-  const stageLight = new T.PointLight("#ffb3a0",1.0,18); stageLight.position.set(sx+sw/2,4,sz+sd+1.5); scene.add(stageLight);
+  const stageLight = new T.PointLight("#ffb3a0",0.4,14); stageLight.position.set(sx+sw/2,4,sz+sd+1.5); scene.add(stageLight);
   // ribbon-cutting setup in front of the stage
   const rcZ = Z(400), rx1 = X(770), rx2 = X(1030);
   [rx1,rx2].forEach(x => { box(0.08,1.1,0.08,goldM(),x,0.55,rcZ); const base=new T.Mesh(new T.CylinderGeometry(0.22,0.26,0.06,20),goldM()); base.position.set(x,0.03,rcZ); scene.add(base); const top=new T.Mesh(new T.SphereGeometry(0.07,12,10),goldM()); top.position.set(x,1.12,rcZ); scene.add(top); });
@@ -1171,8 +1173,8 @@ function sync3D(dt,t){
     zoneMeshes[z.id].material.opacity = me.zone===z.id ? 0.6+Math.sin(t/200)*0.3 : 0.4;
     doneSprites[z.id].visible = z.id==="wheel" ? !!me.spun : me.stamps.has(z.id);
   }
-  bulbs.forEach((b,i) => b.material.color.set(Math.sin(t/300+i*0.7)>0 ? "#f3c34b" : "#8a6a2a"));
-  beams.forEach(({pivot,i}) => { pivot.rotation.x = 0.55 + Math.sin(t/1700+i)*0.25; pivot.rotation.z = Math.sin(t/1300+i*2)*0.5; });
+  bulbs.forEach((b,i) => { const k = 0.55+0.45*Math.sin(t/900+i*0.5); b.material.color.setRGB(0.95*k+0.3*(1-k), 0.76*k+0.25*(1-k), 0.29*k+0.12*(1-k)); });
+  beams.forEach(({pivot,i}) => { pivot.rotation.x = 0.55 + Math.sin(t/2600+i)*0.18; pivot.rotation.z = Math.sin(t/2200+i*2)*0.35; });
   targetMarker.visible = !!(target && me.joined);
   if(target){ targetMarker.position.x=X(target.x); targetMarker.position.z=Z(target.y); const s=1+Math.sin(t/150)*0.15; targetMarker.scale.set(s,s,s); }
 }
